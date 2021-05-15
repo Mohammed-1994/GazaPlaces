@@ -2,13 +2,13 @@ package com.awad.gazaplace
 
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import android.view.View.GONE
 import androidx.appcompat.app.AppCompatActivity
+import com.awad.gazaplace.adapters.MainAdapter
 import com.awad.gazaplace.adapters.MetDataAdapter
 import com.awad.gazaplace.data.PlaceMetaData
-import com.awad.gazaplace.data.RestaurantModel
 import com.awad.gazaplace.databinding.ActivityMainBinding
+import com.awad.gazaplace.firebase.FirebaseQueries
 import com.awad.gazaplace.maps.MyLocationUpdatesCallback
 import com.awad.gazaplace.maps.UpdateLocation
 import com.awad.gazaplace.util.Util
@@ -32,7 +32,11 @@ class MainActivity : AppCompatActivity(), MyLocationUpdatesCallback {
 
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var adapter: MetDataAdapter
+    private lateinit var metaDataAdapter: MetDataAdapter
+    private lateinit var mainAdapter: MainAdapter
+    private lateinit var query: FirebaseQueries
+    private var gotLocation = false
+    private var radius = 10000.0
 
     private val util: Util = Util(this)
     private val updateLocation: UpdateLocation = UpdateLocation(this)
@@ -42,36 +46,42 @@ class MainActivity : AppCompatActivity(), MyLocationUpdatesCallback {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        Log.d(TAG, "onCreate: ")
+
         util.checkForPermissions()
 
+        query = FirebaseQueries(this, fireStore)
         //query
-        val queryCollectionGroup = fireStore.collectionGroup("meta_data").whereEqualTo("type", "مطعم")
+        val queryCollectionGroup =
+            fireStore.collectionGroup(getString(R.string.collection_group_meta_data))
+                .whereEqualTo(
+                    getString(R.string.firestore_field_type),
+                    getString(R.string.firetore_field_restaurant)
+                )
+
 
         // options
         val options: FirestoreRecyclerOptions<PlaceMetaData> =
             FirestoreRecyclerOptions.Builder<PlaceMetaData>()
                 .setQuery(queryCollectionGroup, PlaceMetaData::class.java)
+
                 .build()
 
 
-        adapter = MetDataAdapter(options, this)
-
-        binding.recyclerView.adapter = adapter
-        Log.d(TAG, "onCreate: ${adapter.itemCount}")
+        metaDataAdapter = MetDataAdapter(options, this)
+        mainAdapter = MainAdapter(this)
+        binding.recyclerView.adapter = mainAdapter
 
 
     }
 
+
     override fun onResume() {
-        Log.d(TAG, "onResume: ")
         super.onResume()
         updateLocation.updateLocation()
     }
 
 
     override fun onPause() {
-        Log.d(TAG, "onPause: ")
         super.onPause()
         updateLocation.removeLocationUpdates()
 
@@ -79,24 +89,31 @@ class MainActivity : AppCompatActivity(), MyLocationUpdatesCallback {
 
     override fun onStop() {
         super.onStop()
-        adapter.stopListening()
+        metaDataAdapter.stopListening()
     }
 
     override fun onStart() {
         super.onStart()
-        adapter.startListening()
+        metaDataAdapter.startListening()
 
 
     }
 
     override fun onLocationUpdated(location: Location) {
-        Log.d(TAG, "onLocationUpdated: lat= ${location.latitude}, Lng= ${location.longitude}")
-        adapter.findDistance(location)
+        if (!gotLocation) {
+            query.nearestLocations(location, radius)
+            mainAdapter.findDistance(location)
+        }
+        gotLocation = true
+
     }
 
     fun setProgressBar() {
         binding.progressCircular.visibility = GONE
     }
+
+    fun submitNearestPlacesToAdapter(nearestPlaces: MutableList<PlaceMetaData>) =
+        mainAdapter.submitPlaces(nearestPlaces)
 
 
 }

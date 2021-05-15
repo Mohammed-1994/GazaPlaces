@@ -30,6 +30,7 @@ class UpdateLocation @Inject constructor(@ApplicationContext val context: Contex
                     Log.d(TAG, "onLocationResult: result not null,")
                     context as MainActivity
                     context.onLocationUpdated(location)
+                    removeLocationUpdates()
                 }
             }
         }
@@ -60,7 +61,7 @@ class UpdateLocation @Inject constructor(@ApplicationContext val context: Contex
     private fun createLocationRequest(): LocationRequest? {
         Log.d(TAG, "createLocationRequest: ")
         return LocationRequest.create()?.apply {
-            interval = 10000
+            interval = 3000
             fastestInterval = 5000
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }

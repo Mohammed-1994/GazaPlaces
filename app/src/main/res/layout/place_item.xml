@@ -24,6 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:text="title"
+            android:layout_marginBottom="16dp"
             android:textColor="@android:color/black"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -31,15 +32,24 @@
             app:layout_constraintTop_toTopOf="parent" />
 
 
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_margin="4dp"
+            android:src="@drawable/fui_ic_googleg_color_24dp"
+            android:layout_marginTop="20dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintTop_toBottomOf="@+id/title"
+            tools:layout_editor_absoluteX="4dp" />
+
         <TextView
             android:id="@+id/description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
             android:text="description"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/title" />
+            app:layout_constraintTop_toBottomOf="@+id/imageView"
+            tools:layout_editor_absoluteX="0dp" />
 
         <TextView
             android:id="@+id/address"

@@ -7,14 +7,17 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.awad.gazaplace.MainActivity
+import com.awad.gazaplace.R
+import com.awad.gazaplace.adapters.PlaceAdapter.PlaceViewHolder
+import com.awad.gazaplace.data.PlaceMetaData
 import com.awad.gazaplace.data.RestaurantModel
 import com.awad.gazaplace.databinding.PlaceItemBinding
+import com.bumptech.glide.Glide
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.qualifiers.ActivityContext
-import java.lang.NullPointerException
 
 
 private const val TAG = "PlaceAdapter myTag"
@@ -22,7 +25,7 @@ private const val TAG = "PlaceAdapter myTag"
 class PlaceAdapter(
     options: FirestoreRecyclerOptions<RestaurantModel>?, @ActivityContext var context: Context
 ) :
-    FirestoreRecyclerAdapter<RestaurantModel, PlaceAdapter.PlaceViewHolder>(options!!) {
+    FirestoreRecyclerAdapter<RestaurantModel, PlaceViewHolder>(options!!) {
 
     private var location = Location("")
     private lateinit var mBinding: PlaceItemBinding
@@ -35,7 +38,6 @@ class PlaceAdapter(
     override fun onDataChanged() {
         super.onDataChanged()
         notifyDataSetChanged()
-        Log.d(TAG, "onDataChanged: ")
 
         if (context is MainActivity)
             (context as MainActivity).setProgressBar()
@@ -47,10 +49,46 @@ class PlaceAdapter(
         Log.e(TAG, "onError: ", e)
     }
 
-    override fun getItemCount(): Int {
+    private fun getImages(model: PlaceMetaData, holder: MetDataAdapter.MetaDataViewHolder) {
+        (context as MainActivity).fireStore.collection(context.getString(R.string.firestore_collection_cities))
+            .document(model.city)
+            .collection(model.type)
+            .document(model.ref_id).get()
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+//                    Log.d(TAG, "getImages: ${model.ref_id}")
 
-        return super.getItemCount()
+
+                    var imagesList = ArrayList<String>()
+                    if (it.result[context.getString(R.string.firestore_field_images)] != null)
+                        imagesList =
+                            (it.result[context.getString(R.string.firestore_field_images)]) as ArrayList<String>
+
+                    showImages(imagesList, holder)
+
+                } else
+                    Log.e(TAG, "showImage: Error", it.exception)
+
+            }
+
+
     }
+
+    private fun showImages(
+        imagesList: java.util.ArrayList<*>,
+        holder: MetDataAdapter.MetaDataViewHolder
+    ) {
+
+        with(holder) {
+            if (imagesList.size > 0) {
+                Glide.with(context)
+                    .load(imagesList[0])
+                    .into(binding.imageView)
+            }
+        }
+
+    }
+
 
     override fun onBindViewHolder(
         holder: PlaceViewHolder,
@@ -59,18 +97,23 @@ class PlaceAdapter(
     ) {
 
 
-        Log.d(TAG, "onBindViewHolder: ")
         with(holder) {
 
 
             try {
-                Log.d(TAG, "onBindViewHolder: trying")
                 mBinding = binding
-                binding.address.text = model.main_info?.get("address").toString()
-                binding.title.text = model.main_info?.get("name").toString()
-                binding.description.text = model.main_info?.get("description").toString()
+                binding.address.text =
+                    model.main_info?.get(context.getString(R.string.firestore_field_address))
+                        .toString()
+                binding.title.text =
+                    model.main_info?.get(context.getString(R.string.firestore_field_name))
+                        .toString()
+                binding.description.text =
+                    model.main_info?.get(context.getString(R.string.firestore_field_description))
+                        .toString()
 
-                val placeGeoPoint: GeoPoint = model.main_info?.get("location") as GeoPoint
+                val placeGeoPoint: GeoPoint =
+                    model.main_info?.get(context.getString(R.string.firestore_field_location)) as GeoPoint
                 val placeLocation = Location("")
 
                 placeLocation.latitude = placeGeoPoint.latitude
@@ -80,6 +123,17 @@ class PlaceAdapter(
                 if (distance < 1.0)
                     distance = 1F
                 binding.distance.text = "${distance.toInt()}  km"
+
+                val imagesList = model.images
+
+                if (imagesList.size > 0) {
+                    Glide.with(context)
+                        .load(imagesList[0])
+                        .into(binding.imageView)
+                } else {
+
+                }
+
 
             } catch (e: NullPointerException) {
                 Log.e(TAG, "onBindViewHolder: ", e)

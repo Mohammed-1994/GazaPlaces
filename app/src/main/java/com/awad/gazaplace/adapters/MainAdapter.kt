@@ -2,7 +2,6 @@ package com.awad.gazaplace.adapters
 
 import android.content.Context
 import android.location.Location
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -12,89 +11,65 @@ import com.awad.gazaplace.R
 import com.awad.gazaplace.data.PlaceMetaData
 import com.awad.gazaplace.databinding.PlaceItemBinding
 import com.bumptech.glide.Glide
-import com.firebase.ui.firestore.FirestoreRecyclerAdapter
-import com.firebase.ui.firestore.FirestoreRecyclerOptions
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.qualifiers.ActivityContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
 
-private const val TAG = "MetDataAdapter myTag"
+private const val TAG = "MinAdapter, myTag"
 
-class MetDataAdapter(
-    options: FirestoreRecyclerOptions<PlaceMetaData>?, @ActivityContext var context: Context
-) :
-    FirestoreRecyclerAdapter<PlaceMetaData, MetDataAdapter.MetaDataViewHolder>(options!!) {
+class MainAdapter(@ActivityContext var context: Context) :
+    RecyclerView.Adapter<MainAdapter.MainAdapterViewHolder>() {
 
-    @Inject
-    @Singleton
-    lateinit var fireStore: FirebaseFirestore
 
     private var location = Location("")
+    var matchingDocs: MutableList<PlaceMetaData> = ArrayList()
 
-
-    inner class MetaDataViewHolder(val binding: PlaceItemBinding) :
+    inner class MainAdapterViewHolder(val binding: PlaceItemBinding) :
         RecyclerView.ViewHolder(binding.root)
 
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MetaDataViewHolder {
-
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainAdapterViewHolder {
         val view = PlaceItemBinding
             .inflate(LayoutInflater.from(parent.context), parent, false)
-        return MetaDataViewHolder(view)
+        return MainAdapterViewHolder(view)
 
     }
 
-
-    override fun onDataChanged() {
-        super.onDataChanged()
-        notifyDataSetChanged()
-
-        if (context is MainActivity)
-            (context as MainActivity).setProgressBar()
-
+    override fun getItemCount(): Int {
+        return matchingDocs.size
     }
 
-    override fun onError(e: FirebaseFirestoreException) {
-        super.onError(e)
-        Log.e(TAG, "onError: ", e)
-    }
+    override fun onBindViewHolder(holder: MainAdapterViewHolder, position: Int) {
 
-
-    override fun onBindViewHolder(
-        holder: MetDataAdapter.MetaDataViewHolder,
-        position: Int,
-        model: PlaceMetaData
-    ) {
-
+        val currentPlace = matchingDocs[position]
         with(holder) {
 
             binding.root.setOnClickListener {
-                Toast.makeText(context, model.name, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, currentPlace.name, Toast.LENGTH_SHORT).show()
             }
             try {
+                binding.address.text = currentPlace.address
+                binding.title.text = currentPlace.name
+                binding.description.text = currentPlace.ref_id
 
-                binding.address.text = model.address
-                binding.title.text = model.name
-                binding.description.text = model.ref_id
+                showDistance(currentPlace, this)
 
-                showDistance(model, this)
-
-                getImages(model, holder)
+                getImages(currentPlace, holder)
 
             } catch (e: NullPointerException) {
-                Log.e(TAG, "onBindViewHolder: ", e)
             }
-
         }
+
+
     }
 
-    private fun getImages(model: PlaceMetaData, holder: MetDataAdapter.MetaDataViewHolder) {
-        (context as MainActivity).fireStore.collection(context.getString(R.string.firestore_collection_cities))
-            .document(model.city)
+    fun submitPlaces(matchingDocs: MutableList<PlaceMetaData>) {
+        this.matchingDocs = matchingDocs
+
+        notifyDataSetChanged()
+    }
+
+    private fun getImages(model: PlaceMetaData, holder: MainAdapterViewHolder) {
+        (context as MainActivity).fireStore.collection(context.getString(R.string.firestore_collection_cities)).document(model.city)
             .collection(model.type)
             .document(model.ref_id).get()
             .addOnCompleteListener {
@@ -104,13 +79,11 @@ class MetDataAdapter(
 
                     var imagesList = ArrayList<String>()
                     if (it.result[context.getString(R.string.firestore_field_images)] != null)
-                        imagesList =
-                            (it.result[context.getString(R.string.firestore_field_images)]) as ArrayList<String>
+                        imagesList = (it.result["images"]) as ArrayList<String>
 
                     showImages(imagesList, holder)
 
-                } else
-                    Log.e(TAG, "showImage: Error", it.exception)
+                }
 
             }
 
@@ -119,7 +92,7 @@ class MetDataAdapter(
 
     private fun showImages(
         imagesList: java.util.ArrayList<*>,
-        holder: MetaDataViewHolder
+        holder: MainAdapterViewHolder
     ) {
 
         with(holder) {
@@ -140,7 +113,7 @@ class MetDataAdapter(
         notifyDataSetChanged()
     }
 
-    private fun showDistance(model: PlaceMetaData, holder: MetDataAdapter.MetaDataViewHolder) {
+    private fun showDistance(model: PlaceMetaData, holder: MainAdapterViewHolder) {
         with(holder) {
             val placeGeoPoint: GeoPoint = model.location
             val placeLocation = Location("")
