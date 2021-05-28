@@ -2,12 +2,16 @@ package com.awad.gazaplace.firebase
 
 import android.content.Context
 import android.location.Location
+import android.util.Log
 import com.awad.gazaplace.MainActivity
 import com.awad.gazaplace.R
+import com.awad.gazaplace.adapters.PlaceAdapter
 import com.awad.gazaplace.data.PlaceMetaData
+import com.awad.gazaplace.data.RestaurantModel
 import com.firebase.geofire.GeoFireUtils
 import com.firebase.geofire.GeoLocation
 import com.firebase.geofire.GeoQueryBounds
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
@@ -16,7 +20,8 @@ import com.google.firebase.firestore.QuerySnapshot
 import dagger.hilt.android.qualifiers.ActivityContext
 
 private const val TAG = "FirebaseQueries, myTag"
-class FirebaseQueries (@ActivityContext var context: Context, var fireStore: FirebaseFirestore){
+
+class FirebaseQueries(@ActivityContext var context: Context, var fireStore: FirebaseFirestore) {
 
     /**
      * get the nearest places with specific radius.
@@ -27,25 +32,28 @@ class FirebaseQueries (@ActivityContext var context: Context, var fireStore: Fir
      */
 
     fun nearestLocations(center: Location, radius: Double) {
+        Log.d(TAG, "nearestLocations: radius = $radius")
         val matchingDocs: MutableList<PlaceMetaData> = ArrayList()
         val center = GeoLocation(center.latitude, center.longitude)
 
         val bounds: List<GeoQueryBounds> = GeoFireUtils.getGeoHashQueryBounds(
             center,
-            radius
+            radius 
         )
         val tasks: MutableList<Task<QuerySnapshot>> = ArrayList()
         for (b in bounds) {
 
-            val q: Query = fireStore.collectionGroup(context.getString(R.string.collection_group_meta_data))
-                .orderBy(context.getString(R.string.firestore_field_geo_hash))
-                .startAt(b.startHash)
-                .endAt(b.endHash)
+            val q: Query =
+                fireStore.collectionGroup(context.getString(R.string.collection_group_meta_data))
+                    .orderBy(context.getString(R.string.firestore_field_geo_hash))
+                    .startAt(b.startHash)
+                    .endAt(b.endHash)
 
 
             tasks.add(q.get())
         }
         // Collect all the query results together into a single list
+        Log.d(TAG, "nearestLocations: task size = ${tasks.size}")
         Tasks.whenAllComplete(tasks)
             .addOnCompleteListener {
 
@@ -66,8 +74,76 @@ class FirebaseQueries (@ActivityContext var context: Context, var fireStore: Fir
                 }
 
                 (context as MainActivity).submitNearestPlacesToAdapter(matchingDocs)
+                Log.d(TAG, "nearestLocations: result size = ${matchingDocs.size}")
             }
 
     }
 
+    fun queryWithCityAndType(city: String, type: String): PlaceAdapter {
+        val q = fireStore.collection(context.getString(R.string.firestore_collection_cities))
+            .document(city)
+            .collection(type)
+
+
+        val options: FirestoreRecyclerOptions<RestaurantModel> =
+            FirestoreRecyclerOptions.Builder<RestaurantModel>()
+                .setQuery(q, RestaurantModel::class.java)
+                .build()
+
+        return PlaceAdapter(options, context)
+
+
+    }
+
+
+    fun searchArea(location: Location, type: String, radius: Double) {
+        Log.d(TAG, "searchArea: ")
+        val matchingDocs: MutableList<PlaceMetaData> = ArrayList()
+        val center = GeoLocation(location.latitude, location.longitude)
+
+
+        val bounds: List<GeoQueryBounds> = GeoFireUtils.getGeoHashQueryBounds(
+            center,
+            radius
+        )
+        Log.d(TAG, "searchArea: bound size = ${bounds.size}")
+        val tasks: MutableList<Task<QuerySnapshot>> = ArrayList()
+        for (b in bounds) {
+
+            val q: Query =
+                fireStore.collectionGroup(context.getString(R.string.collection_group_meta_data))
+                    .whereEqualTo(context.getString(R.string.firestore_field_type), type)
+                    .orderBy(context.getString(R.string.firestore_field_geo_hash))
+                    .startAt(b.startHash)
+                    .endAt(b.endHash)
+
+
+            tasks.add(q.get())
+        }
+        Log.d(TAG, "searchArea: tasks size = ${tasks.size}")
+        // Collect all the query results together into a single list
+        Tasks.whenAllComplete(tasks)
+            .addOnCompleteListener {
+                if (!it.isSuccessful)
+                    Log.e(TAG, "searchArea: Error", it.exception)
+
+                for (task in tasks) {
+                    val snap = task.result
+                    for (doc in snap.documents) {
+                        val location = doc.toObject(PlaceMetaData::class.java)
+                        val lat = doc.get("lat")!! as Double
+                        val lng = doc.get("lng")!! as Double
+
+                        val docLocation = GeoLocation(lat, lng)
+                        val distanceInM = GeoFireUtils.getDistanceBetween(docLocation, center)
+                        if (distanceInM <= radius) {
+                            matchingDocs.add(location!!)
+                        }
+                    }
+
+                }
+                Log.d(TAG, "searchArea: size = ${matchingDocs.size}")
+                (context as MainActivity).submitNearestPlacesToAdapter(matchingDocs)
+            }
+    }
 }

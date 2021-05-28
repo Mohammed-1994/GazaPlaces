@@ -7,7 +7,6 @@ import android.location.Location
 import android.os.Looper
 import android.util.Log
 import androidx.core.app.ActivityCompat
-import com.awad.gazaplace.MainActivity
 import com.google.android.gms.location.*
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -17,6 +16,7 @@ private const val TAG = "UpdateLocation myTag"
 class UpdateLocation @Inject constructor(@ApplicationContext val context: Context) {
 
     lateinit var fusedLocationClient: FusedLocationProviderClient
+    lateinit var listener: MyLocationUpdatesCallback
 
     private lateinit var locationCallback: LocationCallback
 
@@ -28,8 +28,8 @@ class UpdateLocation @Inject constructor(@ApplicationContext val context: Contex
                 locationResult ?: return
                 for (location in locationResult.locations) {
                     Log.d(TAG, "onLocationResult: result not null,")
-                    context as MainActivity
-                    context.onLocationUpdated(location)
+                    listener = context as MyLocationUpdatesCallback
+                    listener.onLocationUpdated(location)
                     removeLocationUpdates()
                 }
             }

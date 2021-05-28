@@ -66,7 +66,9 @@ class MainAdapter(@ActivityContext var context: Context) :
         this.matchingDocs = matchingDocs
 
         notifyDataSetChanged()
+        (context as MainActivity).setProgressBar()
     }
+
 
     private fun getImages(model: PlaceMetaData, holder: MainAdapterViewHolder) {
         (context as MainActivity).fireStore.collection(context.getString(R.string.firestore_collection_cities)).document(model.city)

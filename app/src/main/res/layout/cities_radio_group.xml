@@ -1,0 +1,34 @@
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/cities_radio_group"
+        android:orientation="horizontal">
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/rafah"
+            android:onClick="onCitiesRadioClicked"/>
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/kahan_yunis"
+            android:onClick="onCitiesRadioClicked"/>
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/central"
+            android:onClick="onCitiesRadioClicked"/>
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/gaza"
+            android:onClick="onCitiesRadioClicked"/>
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/north"
+            android:onClick="onCitiesRadioClicked"/>
+
+    </RadioGroup>
+</merge>

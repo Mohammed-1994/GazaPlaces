@@ -39,6 +39,7 @@ class PlaceAdapter(
         super.onDataChanged()
         notifyDataSetChanged()
 
+        Log.d(TAG, "onDataChanged: size = $itemCount")
         if (context is MainActivity)
             (context as MainActivity).setProgressBar()
 

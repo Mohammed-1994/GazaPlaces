@@ -2,6 +2,22 @@
     <string name="app_name">Gaza Places</string>
 
 
+    <string name="chose_city">حدد المحافظة</string>
+    <string name="chose_type">حدد نوع المكان</string>
+    <string name="north">الشمال</string>
+    <string name="rafah">رفح</string>
+    <string name="kahan_yunis">خان يونس</string>
+    <string name="central">الوسطى</string>
+    <string name="gaza">غزة</string>
+    <string name="restaurant">مطعم</string>
+    <string name="coffee_shop">كفي شوب</string>
+    <string name="ice_cream">مرطبات</string>
+    <string name="coffee">قهوة</string>
+    <string name="sweets">حلويات</string>
+    <string name="chose_city_and_type">\حدد المحافظة ونوع المكان</string>
+    <string name="filter_result">تخصيص النتائج</string>
+    <string name="okay">حسناً</string>
+    <string name="cancel">إلغاء</string>
 
 
 <!--     firestor fields       -->
@@ -15,4 +31,6 @@
     <string name="firestore_field_location">location</string>
     <string name="firestore_field_description">description</string>
     <string name="firestore_field_geo_hash">geo_hash</string>
+
+
 </resources>
