@@ -1,12 +1,11 @@
 package com.awad.gazaplace.util
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.awad.gazaplace.MainActivity
+import com.awad.gazaplace.ui.MainActivity
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -31,8 +30,7 @@ class Util @Inject constructor(@ApplicationContext val context: Context) {
                 context,
                 permission
             ) == PackageManager.PERMISSION_GRANTED
-        )    // You can use the API that requires the permission.
-
+        )
         else {
             // You can directly ask for the permission.
             // The registered ActivityResultCallback gets the result of this request.
@@ -42,6 +40,8 @@ class Util @Inject constructor(@ApplicationContext val context: Context) {
                 arrayOf(permission), 1
             )
         }
+
     }
+
 
 }

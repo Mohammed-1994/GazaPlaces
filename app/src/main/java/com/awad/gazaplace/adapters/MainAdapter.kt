@@ -1,15 +1,16 @@
 package com.awad.gazaplace.adapters
 
 import android.content.Context
+import android.content.Intent
 import android.location.Location
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.awad.gazaplace.MainActivity
 import com.awad.gazaplace.R
 import com.awad.gazaplace.data.PlaceMetaData
 import com.awad.gazaplace.databinding.PlaceItemBinding
+import com.awad.gazaplace.ui.MainActivity
+import com.awad.gazaplace.ui.PlaceActivity
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.qualifiers.ActivityContext
@@ -44,7 +45,7 @@ class MainAdapter(@ActivityContext var context: Context) :
         with(holder) {
 
             binding.root.setOnClickListener {
-                Toast.makeText(context, currentPlace.name, Toast.LENGTH_SHORT).show()
+                getModel(currentPlace)
             }
             try {
                 binding.address.text = currentPlace.address
@@ -62,23 +63,31 @@ class MainAdapter(@ActivityContext var context: Context) :
 
     }
 
+    private fun getModel(currentMetaData: PlaceMetaData) {
+
+        val intent = Intent(context, PlaceActivity::class.java)
+        intent.putExtra("ref", currentMetaData.ref_id)
+        intent.putExtra(context.getString(R.string.firestore_field_type), currentMetaData.type)
+        intent.putExtra(context.getString(R.string.firestore_field_city), currentMetaData.city)
+        context.startActivity(intent)
+
+    }
+
     fun submitPlaces(matchingDocs: MutableList<PlaceMetaData>) {
         this.matchingDocs = matchingDocs
 
         notifyDataSetChanged()
-        (context as MainActivity).setProgressBar()
+        (context as MainActivity).setProgressBar(itemCount)
     }
 
 
     private fun getImages(model: PlaceMetaData, holder: MainAdapterViewHolder) {
-        (context as MainActivity).fireStore.collection(context.getString(R.string.firestore_collection_cities)).document(model.city)
+        (context as MainActivity).fireStore.collection(context.getString(R.string.firestore_collection_cities))
+            .document(model.city)
             .collection(model.type)
             .document(model.ref_id).get()
             .addOnCompleteListener {
                 if (it.isSuccessful) {
-//                    Log.d(TAG, "getImages: ${model.ref_id}")
-
-
                     var imagesList = ArrayList<String>()
                     if (it.result[context.getString(R.string.firestore_field_images)] != null)
                         imagesList = (it.result["images"]) as ArrayList<String>
@@ -91,6 +100,7 @@ class MainAdapter(@ActivityContext var context: Context) :
 
 
     }
+
 
     private fun showImages(
         imagesList: java.util.ArrayList<*>,

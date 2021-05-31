@@ -20,9 +20,10 @@
     <string name="cancel">إلغاء</string>
 
 
-<!--     firestor fields       -->
+    <!--     firestor fields       -->
     <string name="collection_group_meta_data">meta_data</string>
     <string name="firestore_field_type">type</string>
+    <string name="firestore_field_city">city</string>
     <string name="firetore_field_restaurant">مطعم</string>
     <string name="firestore_collection_cities">cities</string>
     <string name="firestore_field_images">images</string>
@@ -31,6 +32,7 @@
     <string name="firestore_field_location">location</string>
     <string name="firestore_field_description">description</string>
     <string name="firestore_field_geo_hash">geo_hash</string>
+    <string name="no_result"> لا يوجد نتائج, جرب طريقة أخرى للبحث</string>
 
 
 </resources>

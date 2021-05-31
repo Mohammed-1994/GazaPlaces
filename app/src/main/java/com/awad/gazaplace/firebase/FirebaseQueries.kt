@@ -3,11 +3,11 @@ package com.awad.gazaplace.firebase
 import android.content.Context
 import android.location.Location
 import android.util.Log
-import com.awad.gazaplace.MainActivity
 import com.awad.gazaplace.R
 import com.awad.gazaplace.adapters.PlaceAdapter
 import com.awad.gazaplace.data.PlaceMetaData
 import com.awad.gazaplace.data.RestaurantModel
+import com.awad.gazaplace.ui.MainActivity
 import com.firebase.geofire.GeoFireUtils
 import com.firebase.geofire.GeoLocation
 import com.firebase.geofire.GeoQueryBounds

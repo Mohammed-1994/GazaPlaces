@@ -1,6 +1,11 @@
 package com.awad.gazaplace.data
 
+import android.os.Parcelable
+import kotlinx.android.parcel.RawValue
+import kotlinx.parcelize.Parcelize
 
+
+@Parcelize
 
 data class RestaurantModel(
     val service_options: ArrayList<String> = ArrayList(),
@@ -15,8 +20,8 @@ data class RestaurantModel(
     val atmosphere: ArrayList<String> = ArrayList(),
     val images: ArrayList<String> = ArrayList(),
     val planning: ArrayList<String> = ArrayList(),
-    var main_info:HashMap<String,Any>? = HashMap(),
+    var main_info: @RawValue HashMap<String, Any>? = HashMap(),
 
     val place_number: Int = 0
 
-)
+) : Parcelable

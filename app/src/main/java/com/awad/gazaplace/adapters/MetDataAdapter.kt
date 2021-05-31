@@ -7,10 +7,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.awad.gazaplace.MainActivity
 import com.awad.gazaplace.R
 import com.awad.gazaplace.data.PlaceMetaData
 import com.awad.gazaplace.databinding.PlaceItemBinding
+import com.awad.gazaplace.ui.MainActivity
 import com.bumptech.glide.Glide
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
@@ -55,7 +55,7 @@ class MetDataAdapter(
         Log.d(TAG, "onDataChanged: size = $itemCount")
 
         if (context is MainActivity)
-            (context as MainActivity).setProgressBar()
+            (context as MainActivity).setProgressBar(itemCount)
 
     }
 
