@@ -10,5 +10,6 @@ public class TestJava {
 
         HashMap<String, String> main_info = new HashMap<>();
         EditText editText ;
+
     }
 }

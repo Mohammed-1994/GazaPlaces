@@ -3,6 +3,7 @@ package com.awad.gazaplace.adapters
 import android.content.Context
 import android.content.Intent
 import android.location.Location
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -45,7 +46,7 @@ class MainAdapter(@ActivityContext var context: Context) :
         with(holder) {
 
             binding.root.setOnClickListener {
-                getModel(currentPlace)
+                navigateToPlaceActivity(currentPlace)
             }
             try {
                 binding.address.text = currentPlace.address
@@ -63,7 +64,7 @@ class MainAdapter(@ActivityContext var context: Context) :
 
     }
 
-    private fun getModel(currentMetaData: PlaceMetaData) {
+    private fun navigateToPlaceActivity(currentMetaData: PlaceMetaData) {
 
         val intent = Intent(context, PlaceActivity::class.java)
         intent.putExtra("ref", currentMetaData.ref_id)
@@ -74,10 +75,11 @@ class MainAdapter(@ActivityContext var context: Context) :
     }
 
     fun submitPlaces(matchingDocs: MutableList<PlaceMetaData>) {
+        Log.d(TAG, "submitPlaces: ${matchingDocs.size}")
         this.matchingDocs = matchingDocs
-
-        notifyDataSetChanged()
         (context as MainActivity).setProgressBar(itemCount)
+        notifyDataSetChanged()
+
     }
 
 

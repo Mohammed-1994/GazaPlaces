@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/map_place_menu"
+        android:icon="@drawable/ic_baseline_location_on_24"
+        android:title="بحث في المنطقة المحيطة"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/call_place_menu"
+        android:icon="@drawable/ic_baseline_call_24"
+        android:title="بحث متقدم"
+        app:showAsAction="ifRoom" />
+</menu>

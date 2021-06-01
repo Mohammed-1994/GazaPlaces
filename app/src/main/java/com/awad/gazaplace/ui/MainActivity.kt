@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity(), MyLocationUpdatesCallback, NoticeDialo
 
         checkLocationPermission()
         firebaseQueries = FirebaseQueries(this, fireStore)
-        placeAdapter = firebaseQueries.queryWithCityAndType(city, type)
+//        placeAdapter = firebaseQueries.queryWithCityAndType(city, type)
         mainAdapter = MainAdapter(this)
 
         binding.recyclerView.adapter = mainAdapter
@@ -96,6 +96,7 @@ class MainActivity : AppCompatActivity(), MyLocationUpdatesCallback, NoticeDialo
 
 
     fun submitNearestPlacesToAdapter(nearestPlaces: MutableList<PlaceMetaData>) {
+        Log.d(TAG, "submitNearestPlacesToAdapter: ${nearestPlaces.size}")
         binding.recyclerView.adapter = mainAdapter
         mainAdapter.submitPlaces(nearestPlaces)
     }
@@ -168,7 +169,6 @@ class MainActivity : AppCompatActivity(), MyLocationUpdatesCallback, NoticeDialo
     override fun onResume() {
         super.onResume()
         Log.d(TAG, "onResume: ")
-        placeAdapter.startListening()
         updateLocation.updateLocation()
     }
 
@@ -183,7 +183,10 @@ class MainActivity : AppCompatActivity(), MyLocationUpdatesCallback, NoticeDialo
     override fun onStop() {
         Log.d(TAG, "onStop: ")
         super.onStop()
-        placeAdapter.stopListening()
+        try {
+            placeAdapter.stopListening()
+        } catch (e: UninitializedPropertyAccessException) {
+        }
 
     }
 
@@ -194,6 +197,7 @@ class MainActivity : AppCompatActivity(), MyLocationUpdatesCallback, NoticeDialo
 
     fun setProgressBar(placesCount: Int) {
         binding.progressCircular.visibility = GONE
+        Log.d(TAG, "setProgressBar: item count = $placesCount")
         if (placesCount > 0)
             binding.noResultTextView.visibility = GONE
         else

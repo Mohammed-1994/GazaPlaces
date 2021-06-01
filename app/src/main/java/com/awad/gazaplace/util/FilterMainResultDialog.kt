@@ -49,10 +49,15 @@ class FilterMainResultDialog(var dialogType: Int) : DialogFragment() {
                 // Add action buttons
                 .setPositiveButton(
                     R.string.okay
-                ) { dialog, id ->
+                ) { _, _ ->
                     if (dialogType == Constants.SEARCH_AREA_OPTION) {
-                        val d = editText.text.toString().toDouble()
-                        listener.onDialogPositiveClick(dialogType, d * 1000)
+                        try {
+                            val d = editText.text.toString().toDouble()
+                            listener.onDialogPositiveClick(dialogType, d * 1000)
+                        } catch (e: NumberFormatException) {
+                            val d = 5.0
+                            listener.onDialogPositiveClick(dialogType, d * 1000)
+                        }
 
                     } else if (dialogType == Constants.FILTER_MAIN_RESULT_OPTION) {
                         listener.onDialogPositiveClick(dialogType, -1.0)
@@ -60,7 +65,7 @@ class FilterMainResultDialog(var dialogType: Int) : DialogFragment() {
                 }
                 .setNegativeButton(
                     R.string.cancel
-                ) { dialog, id ->
+                ) { _, _ ->
                     listener.onDialogNegativeClick(this)
 
                 }

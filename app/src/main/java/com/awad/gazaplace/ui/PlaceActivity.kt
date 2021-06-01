@@ -1,12 +1,23 @@
 package com.awad.gazaplace.ui
 
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
+import android.view.Gravity.CENTER
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.awad.gazaplace.R
 import com.awad.gazaplace.data.RestaurantModel
+import com.awad.gazaplace.databinding.ActivityPlaceBinding
+import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -16,11 +27,18 @@ class PlaceActivity : AppCompatActivity() {
 
     @Inject
     lateinit var fireStore: FirebaseFirestore
+    lateinit var binding: ActivityPlaceBinding
 
+    var currentPlace = RestaurantModel()
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_place)
+        binding = ActivityPlaceBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
 
         val ref = intent.getStringExtra("ref")!!
         val city = intent.getStringExtra(getString(R.string.firestore_field_city))!!
@@ -35,17 +53,129 @@ class PlaceActivity : AppCompatActivity() {
                 if (!it.isSuccessful)
                     Log.e(TAG, "getModel: Error", it.exception)
                 else {
-                    val currentPlace = it.result.toObject(RestaurantModel::class.java)!!
-                    Toast.makeText(
-                        this,
-                        currentPlace.main_info?.get("name").toString(),
-                        Toast.LENGTH_SHORT
-                    ).show()
-
+                    currentPlace = it.result.toObject(RestaurantModel::class.java)!!
+                    showPlaceDetails(currentPlace)
                 }
 
             }
     }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun showPlaceDetails(currentPlace: RestaurantModel) {
+
+        showMainInfo()
+        val mainLayout = binding.mainLayout
+
+        val mainParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+
+            )
+
+        val mainFeaturesList = currentPlace.main_features
+        val accessibilityList = currentPlace.accessibility
+        val amenitiesList = currentPlace.amenities
+        val atmosphereList = currentPlace.atmosphere
+        val eatOptionsList = currentPlace.eat_options
+        val healthAndSafetyList = currentPlace.health_and_safety
+        val paymentList = currentPlace.payment
+        val planningList = currentPlace.planning
+        val publicList = currentPlace.public
+        val serviceOptionsList = currentPlace.service_options
+        val servicesList = currentPlace.services
+
+
+        val allList = hashMapOf(
+            "المميزات الرئيسية" to mainFeaturesList,
+            "امكانية الوصول" to accessibilityList,
+            "وسائل الراحة" to amenitiesList,
+            "الأجواء" to atmosphereList,
+            "خيارات الطعام" to eatOptionsList,
+            "الصحة والأمان" to healthAndSafetyList,
+            "التخطيط" to planningList,
+            "طرق الدفع" to paymentList,
+            "الجمهور" to publicList,
+            "خيارات الخدمة" to serviceOptionsList,
+            "الخدمات المقدمة" to servicesList
+        )
+
+
+        for (list in allList) {
+
+            if (list.value.size > 0) {
+                val textView = TextView(this)
+                textView.text = list.key
+                textView.textSize = 20f
+                textView.gravity = CENTER
+                textView.setTextColor(getColor(android.R.color.black))
+
+                textView.layoutParams = mainParams
+                val linearLayout = LinearLayout(this)
+                linearLayout.orientation = LinearLayout.VERTICAL
+                linearLayout.layoutParams = mainParams
+
+                mainLayout.addView(textView)
+                mainLayout.addView(linearLayout)
+
+                for (service in list.value) {
+                    val textView = TextView(this)
+                    textView.text = service
+
+                    textView.setTextColor(getColor(android.R.color.black))
+                    textView.layoutParams = mainParams
+                    linearLayout.addView(textView)
+                }
+            }
+
+        }
+
+
+    }
+
+    private fun showMainInfo() {
+        val imagesList = currentPlace.images
+        if (imagesList.size>0) {
+            Glide.with(this)
+                .load(imagesList[0])
+                .into(binding.placePictureImage)
+        }
+
+        binding.placeNameText.text = currentPlace.main_info?.get("name").toString()
+        binding.placeAddressText.text = currentPlace.main_info?.get("address").toString()
+
+    }
+    ///**********////****///***//****
+
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.place_activity_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.call_place_menu -> {
+                val phoneNO = currentPlace.main_info?.get("phone").toString()
+
+                val intent = Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phoneNO, null))
+                startActivity(intent)
+                return true
+            }
+            R.id.map_place_menu -> {
+                val location = currentPlace.main_info?.get("location") as GeoPoint
+
+                val intent = Intent(this, MapsActivity::class.java)
+                intent.putExtra("lat", location.latitude)
+                intent.putExtra("lng", location.longitude)
+                intent.putExtra("name", currentPlace.main_info?.get("name").toString())
+                startActivity(intent)
+                return true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
 
     companion object {
         private const val TAG = "PlaceActivity, myTag"
