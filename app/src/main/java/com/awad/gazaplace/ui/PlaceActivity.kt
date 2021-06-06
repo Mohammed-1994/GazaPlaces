@@ -13,9 +13,9 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.awad.gazaplace.R
+import com.awad.gazaplace.adapters.SliderAdapter
 import com.awad.gazaplace.data.RestaurantModel
 import com.awad.gazaplace.databinding.ActivityPlaceBinding
-import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,7 +29,11 @@ class PlaceActivity : AppCompatActivity() {
     lateinit var fireStore: FirebaseFirestore
     lateinit var binding: ActivityPlaceBinding
 
-    var currentPlace = RestaurantModel()
+    private var currentPlace = RestaurantModel()
+    private var view_count = 0
+    private var ref = ""
+    private var city = ""
+    private var type = ""
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,9 +44,14 @@ class PlaceActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        val ref = intent.getStringExtra("ref")!!
-        val city = intent.getStringExtra(getString(R.string.firestore_field_city))!!
-        val type = intent.getStringExtra(getString(R.string.firestore_field_type))!!
+        ref = intent.getStringExtra("ref")!!
+        city = intent.getStringExtra(getString(R.string.firestore_field_city))!!
+        type = intent.getStringExtra(getString(R.string.firestore_field_type))!!
+
+
+
+
+
 
         fireStore.collection(getString(R.string.firestore_collection_cities))
             .document(city)
@@ -55,9 +64,21 @@ class PlaceActivity : AppCompatActivity() {
                 else {
                     currentPlace = it.result.toObject(RestaurantModel::class.java)!!
                     showPlaceDetails(currentPlace)
+                    showViewCount()
                 }
 
             }
+
+    }
+
+    private fun showViewCount() {
+        binding.placeViewCountText.text = currentPlace.view_count.toString()
+        fireStore.collection(getString(R.string.firestore_collection_cities))
+            .document(city)
+            .collection(type)
+            .document(ref)
+            .update("view_count", currentPlace.view_count + 1)
+
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -133,12 +154,16 @@ class PlaceActivity : AppCompatActivity() {
     }
 
     private fun showMainInfo() {
+
+
         val imagesList = currentPlace.images
-        if (imagesList.size>0) {
-            Glide.with(this)
-                .load(imagesList[0])
-                .into(binding.placePictureImage)
-        }
+
+        val sliderView = binding.imageSlider
+        val sliderAdapter = SliderAdapter(this)
+        sliderAdapter.renewItems(imagesList)
+        sliderView.setSliderAdapter(sliderAdapter)
+        sliderView.startAutoCycle();
+
 
         binding.placeNameText.text = currentPlace.main_info?.get("name").toString()
         binding.placeAddressText.text = currentPlace.main_info?.get("address").toString()

@@ -22,6 +22,7 @@ data class RestaurantModel(
     val planning: ArrayList<String> = ArrayList(),
     var main_info: @RawValue HashMap<String, Any>? = HashMap(),
 
-    val place_number: Int = 0
+    val place_number: Int = 0,
+    val view_count: Int = 0
 
 ) : Parcelable

@@ -3,29 +3,39 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/cities_radio_group"
+        android:weightSum="5"
         android:orientation="horizontal">
         <RadioButton
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="@string/rafah"
             android:onClick="onCitiesRadioClicked"/>
         <RadioButton
-            android:layout_width="wrap_content"
+
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="@string/kahan_yunis"
             android:onClick="onCitiesRadioClicked"/>
         <RadioButton
-            android:layout_width="wrap_content"
+
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="@string/central"
             android:onClick="onCitiesRadioClicked"/>
         <RadioButton
-            android:layout_width="wrap_content"
+
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="@string/gaza"
             android:onClick="onCitiesRadioClicked"/>
         <RadioButton
-            android:layout_width="wrap_content"
+
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="@string/north"
             android:onClick="onCitiesRadioClicked"/>

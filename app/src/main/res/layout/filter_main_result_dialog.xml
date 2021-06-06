@@ -8,8 +8,8 @@
         android:id="@+id/chose_city"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/chose_city"
         android:layout_marginBottom="4dp"
+        android:text="@string/chose_city"
         android:textColor="@android:color/black"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -18,22 +18,18 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
-    <RelativeLayout
-        android:id="@+id/rel1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_margin="8dp"
+    <Spinner
+        android:id="@+id/city_spinner"
+        android:layout_width="149dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chose_city"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintVertical_bias="0.0" />
 
-        <include
-            android:id="@+id/cities_radio_group"
-            layout="@layout/cities_radio_group" />
-    </RelativeLayout>
 
     <TextView
         android:id="@+id/chose_type"
@@ -45,17 +41,15 @@
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rel1" />
+        app:layout_constraintTop_toBottomOf="@+id/city_spinner" />
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="4dp"
+    <Spinner
+        android:id="@+id/type_spinner"
+        android:layout_width="149dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chose_type">
+        app:layout_constraintTop_toBottomOf="@+id/chose_type" />
 
-        <include
-            android:id="@+id/types_radio_group"
-            layout="@layout/types_radio_group" />
-    </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

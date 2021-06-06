@@ -4,11 +4,14 @@
     <item
         android:id="@+id/map_place_menu"
         android:icon="@drawable/ic_baseline_location_on_24"
-        android:title="بحث في المنطقة المحيطة"
+        android:title="عرض على الخريطة"
+        android:tooltipText="عرض على الخريطة"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/call_place_menu"
         android:icon="@drawable/ic_baseline_call_24"
-        android:title="بحث متقدم"
+        android:tooltipText="اتصال"
+        android:title="اتصال"
+
         app:showAsAction="ifRoom" />
 </menu>

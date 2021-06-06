@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity(), MyLocationUpdatesCallback, NoticeDialo
     var radius = 10000.0
     private var city = "غزة"
     private var type = "مطعم"
-
+    private var isSearched = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,8 +79,9 @@ class MainActivity : AppCompatActivity(), MyLocationUpdatesCallback, NoticeDialo
         updateLocation.getSettingsResult()
         updateLocation.getLastKnownLocation()
 
-
     }
+
+
 
 
     override fun onLocationUpdated(location: Location) {
@@ -126,8 +127,11 @@ class MainActivity : AppCompatActivity(), MyLocationUpdatesCallback, NoticeDialo
     }
 
     private fun showFilterResultDialog(dialogType: Int) {
-
-        FilterMainResultDialog(dialogType).show(supportFragmentManager, FilterMainResultDialog.TAG)
+        val dialogFragment = FilterMainResultDialog()
+        val b = Bundle()
+        b.putInt("dialog_type", dialogType)
+        dialogFragment.arguments = b
+        dialogFragment.show(supportFragmentManager, FilterMainResultDialog.TAG)
     }
 
 
@@ -143,12 +147,16 @@ class MainActivity : AppCompatActivity(), MyLocationUpdatesCallback, NoticeDialo
         Log.d(TAG, "onTypesRadioClicked: $type")
     }
 
-    override fun onDialogPositiveClick(dialogType: Int, distance: Double) {
+    override fun onDialogPositiveClick(dialogType: Int, distance: Double, city:String, type: String) {
+        isSearched = true
         binding.progressCircular.visibility = VISIBLE
         if (dialogType == Constants.FILTER_MAIN_RESULT_OPTION)
             queryWithCityAndType(city, type)
-        else if (dialogType == Constants.SEARCH_AREA_OPTION)
+        else if (dialogType == Constants.SEARCH_AREA_OPTION) {
+
+            this.type = type
             searchArea(distance)
+        }
     }
 
     private fun queryWithCityAndType(city: String, type: String) {
@@ -156,6 +164,7 @@ class MainActivity : AppCompatActivity(), MyLocationUpdatesCallback, NoticeDialo
         placeAdapter = firebaseQueries.queryWithCityAndType(city, type)
         binding.recyclerView.adapter = placeAdapter
         placeAdapter.startListening()
+        placeAdapter.findDistance(this.currentLocation)
 
 
     }
@@ -168,20 +177,17 @@ class MainActivity : AppCompatActivity(), MyLocationUpdatesCallback, NoticeDialo
 
     override fun onResume() {
         super.onResume()
-        Log.d(TAG, "onResume: ")
         updateLocation.updateLocation()
     }
 
 
     override fun onPause() {
         super.onPause()
-        Log.d(TAG, "onPause: ")
         updateLocation.removeLocationUpdates()
 
     }
 
     override fun onStop() {
-        Log.d(TAG, "onStop: ")
         super.onStop()
         try {
             placeAdapter.stopListening()
@@ -190,14 +196,17 @@ class MainActivity : AppCompatActivity(), MyLocationUpdatesCallback, NoticeDialo
 
     }
 
-    override fun onStart() {
-        Log.d(TAG, "onStart: ")
-        super.onStart()
+    override fun onBackPressed() {
+
+        if (isSearched) {
+            recreate()
+            isSearched = false
+        } else
+            super.onBackPressed()
     }
 
     fun setProgressBar(placesCount: Int) {
         binding.progressCircular.visibility = GONE
-        Log.d(TAG, "setProgressBar: item count = $placesCount")
         if (placesCount > 0)
             binding.noResultTextView.visibility = GONE
         else
