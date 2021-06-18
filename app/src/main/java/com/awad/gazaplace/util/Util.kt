@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.awad.gazaplace.ui.MainActivity
+import com.awad.gazaplace.ui.HomeActivity
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -36,7 +36,7 @@ class Util @Inject constructor(@ApplicationContext val context: Context) {
             // The registered ActivityResultCallback gets the result of this request.
 
             ActivityCompat.requestPermissions(
-                context as MainActivity,
+                context as HomeActivity,
                 arrayOf(permission), 1
             )
         }

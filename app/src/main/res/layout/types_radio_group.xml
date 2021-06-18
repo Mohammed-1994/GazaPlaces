@@ -2,49 +2,67 @@
 
     <RadioGroup
         android:id="@+id/types_radio_group"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="5">
+        android:orientation="horizontal">
 
         <RadioButton
 
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="onTypesRadioClicked"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/your_button_background"
+            android:button="@drawable/your_button_background"
+            android:gravity="center"
+            android:padding="4dp"
+            android:onClick="onTypeRadioGroupClicked"
+
             android:text="@string/restaurant" />
+        <!--            android:onClick="onTypesRadioClicked"-->
 
         <RadioButton
-
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="onTypesRadioClicked"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/your_button_background"
+            android:button="@drawable/your_button_background"
+            android:gravity="center"
+            android:onClick="onTypeRadioGroupClicked"
+            android:padding="4dp"
             android:text="@string/coffee_shop" />
 
         <RadioButton
-
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="onTypesRadioClicked"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/your_button_background"
+            android:button="@drawable/your_button_background"
+            android:gravity="center"
+            android:onClick="onTypeRadioGroupClicked"
+            android:padding="4dp"
             android:text="@string/ice_cream" />
 
-        <RadioButton
 
-            android:layout_width="0dp"
+        <RadioButton
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="onTypesRadioClicked"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/your_button_background"
+            android:button="@drawable/your_button_background"
+            android:gravity="center"
+            android:onClick="onTypeRadioGroupClicked"
+            android:padding="4dp"
             android:text="@string/coffee" />
 
         <RadioButton
-
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="onTypesRadioClicked"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/your_button_background"
+            android:button="@drawable/your_button_background"
+            android:gravity="center"
+            android:onClick="onTypeRadioGroupClicked"
+            android:padding="4dp"
             android:text="@string/sweets" />
 
     </RadioGroup>

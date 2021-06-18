@@ -7,4 +7,11 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+
+    <selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <item android:color="@color/colorAccent" android:state_checked="false" />
+        <item android:color="@color/colorWhite" android:state_checked="true" />
+    </selector>
 </resources>

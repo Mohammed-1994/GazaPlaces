@@ -10,9 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.awad.gazaplace.R
 import com.awad.gazaplace.data.PlaceMetaData
 import com.awad.gazaplace.databinding.PlaceItemBinding
-import com.awad.gazaplace.ui.MainActivity
 import com.awad.gazaplace.ui.PlaceActivity
 import com.bumptech.glide.Glide
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.qualifiers.ActivityContext
 
@@ -77,14 +77,15 @@ class MainAdapter(@ActivityContext var context: Context) :
     fun submitPlaces(matchingDocs: MutableList<PlaceMetaData>) {
         Log.d(TAG, "submitPlaces: ${matchingDocs.size}")
         this.matchingDocs = matchingDocs
-        (context as MainActivity).setProgressBar(itemCount)
+
         notifyDataSetChanged()
 
     }
 
 
     private fun getImages(model: PlaceMetaData, holder: MainAdapterViewHolder) {
-        (context as MainActivity).fireStore.collection(context.getString(R.string.firestore_collection_cities))
+        val fireStore = FirebaseFirestore.getInstance()
+        fireStore.collection(context.getString(R.string.firestore_collection_cities))
             .document(model.city)
             .collection(model.type)
             .document(model.ref_id).get()

@@ -18,6 +18,5 @@ data class PlaceMetaData(
     val images: ArrayList<String> = ArrayList(),
     var location: @RawValue GeoPoint = GeoPoint(0.0, 0.0)
 
-
 ) : Parcelable
 

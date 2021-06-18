@@ -24,7 +24,7 @@
     <string name="collection_group_meta_data">meta_data</string>
     <string name="firestore_field_type">type</string>
     <string name="firestore_field_city">city</string>
-    <string name="firetore_field_restaurant">مطعم</string>
+    <string name="firsetore_field_restaurant">مطعم</string>
     <string name="firestore_collection_cities">cities</string>
     <string name="firestore_field_images">images</string>
     <string name="firestore_field_address">address</string>
@@ -33,7 +33,13 @@
     <string name="firestore_field_description">description</string>
     <string name="firestore_field_geo_hash">geo_hash</string>
     <string name="no_result"> لا يوجد نتائج, جرب طريقة أخرى للبحث</string>
+    <string name="search_hint">حدد المدينة ونوع المكان</string>
+
     <string name="title_activity_maps">Map</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_home">الرئيسية</string>
+    <string name="title_advanced_search">مخصص</string>
+    <string name="title_area">بالقرب</string>
 
 
 </resources>

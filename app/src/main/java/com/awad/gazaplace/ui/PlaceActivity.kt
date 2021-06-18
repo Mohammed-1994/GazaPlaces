@@ -8,7 +8,10 @@ import android.util.Log
 import android.view.Gravity.CENTER
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -49,6 +52,33 @@ class PlaceActivity : AppCompatActivity() {
         type = intent.getStringExtra(getString(R.string.firestore_field_type))!!
 
 
+        var scroll = false
+
+        binding.placeFeaturesText.setOnClickListener {
+
+            if (binding.mainLayout.visibility == VISIBLE) {
+                binding.mainLayout.visibility = GONE
+                binding.root.scrollTo(0,0)
+
+            }
+            else {
+                scroll = true
+                binding.mainLayout.visibility = VISIBLE
+            }
+
+        }
+
+        binding.mainLayout.tag = binding.mainLayout.visibility
+
+        binding.mainLayout.viewTreeObserver.addOnGlobalLayoutListener {
+            val  newVisibility = binding.mainLayout.visibility
+            if (binding.mainLayout.tag as Int != newVisibility){
+                if (scroll) {
+                    binding.root.arrowScroll(ScrollView.FOCUS_DOWN)
+                    scroll = false
+                }
+            }
+        }
 
 
 
@@ -167,6 +197,9 @@ class PlaceActivity : AppCompatActivity() {
 
         binding.placeNameText.text = currentPlace.main_info?.get("name").toString()
         binding.placeAddressText.text = currentPlace.main_info?.get("address").toString()
+        binding.placeDescriptionText.text = currentPlace.main_info?.get("description").toString()
+        binding.placeWebsiteText.text = currentPlace.main_info?.get("website").toString()
+
 
     }
     ///**********////****///***//****
@@ -205,4 +238,5 @@ class PlaceActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "PlaceActivity, myTag"
     }
+
 }

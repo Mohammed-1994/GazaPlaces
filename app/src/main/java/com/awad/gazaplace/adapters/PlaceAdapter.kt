@@ -6,13 +6,15 @@ import android.location.Location
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.awad.gazaplace.R
 import com.awad.gazaplace.adapters.PlaceAdapter.PlaceViewHolder
 import com.awad.gazaplace.data.RestaurantModel
 import com.awad.gazaplace.databinding.PlaceItemBinding
-import com.awad.gazaplace.ui.MainActivity
+import com.awad.gazaplace.ui.HomeActivity
 import com.awad.gazaplace.ui.PlaceActivity
+import com.awad.gazaplace.ui.fragments.filter_search.FilterSearchViewModel
 import com.bumptech.glide.Glide
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
@@ -24,12 +26,15 @@ import dagger.hilt.android.qualifiers.ActivityContext
 private const val TAG = "PlaceAdapter myTag"
 
 class PlaceAdapter(
-    options: FirestoreRecyclerOptions<RestaurantModel>?, @ActivityContext var context: Context
+    options: FirestoreRecyclerOptions<RestaurantModel>?, @ActivityContext var context: Context?
 ) :
     FirestoreRecyclerAdapter<RestaurantModel, PlaceViewHolder>(options!!) {
 
     private var location = Location("")
     private lateinit var mBinding: PlaceItemBinding
+    private val filterSearchViewModel = ViewModelProvider(context as HomeActivity).get(
+        FilterSearchViewModel::class.java
+    )
 
 
     inner class PlaceViewHolder(val binding: PlaceItemBinding) :
@@ -40,8 +45,7 @@ class PlaceAdapter(
         super.onDataChanged()
         notifyDataSetChanged()
         Log.d(TAG, "onDataChanged: $itemCount")
-        if (context is MainActivity)
-            (context as MainActivity).setProgressBar(itemCount)
+        filterSearchViewModel.setData(this)
 
     }
 
@@ -64,34 +68,36 @@ class PlaceAdapter(
                 val intent = Intent(context, PlaceActivity::class.java)
                 intent.putExtra("ref", snapshots.getSnapshot(position).id)
                 intent.putExtra(
-                    context.getString(R.string.firestore_field_type),
-                    model.main_info?.get(context.getString(R.string.firestore_field_type))
-                        .toString()
+                    context?.getString(R.string.firestore_field_type),
+                    context?.let { it1 ->
+                        model.main_info?.get(it1.getString(R.string.firestore_field_type))
+                            .toString()
+                    }
                 )
                 intent.putExtra(
-                    context.getString(R.string.firestore_field_city),
-                    model.main_info?.get(context.getString(R.string.firestore_field_city))
+                    context?.getString(R.string.firestore_field_city),
+                    model.main_info?.get(context?.getString(R.string.firestore_field_city))
                         .toString()
                 )
 
-                context.startActivity(intent)
+                context?.startActivity(intent)
             }
 
             try {
 
                 mBinding = binding
                 binding.address.text =
-                    model.main_info?.get(context.getString(R.string.firestore_field_address))
+                    model.main_info?.get(context?.getString(R.string.firestore_field_address))
                         .toString()
                 binding.title.text =
-                    model.main_info?.get(context.getString(R.string.firestore_field_name))
+                    model.main_info?.get(context?.getString(R.string.firestore_field_name))
                         .toString()
                 binding.description.text =
-                    model.main_info?.get(context.getString(R.string.firestore_field_description))
+                    model.main_info?.get(context?.getString(R.string.firestore_field_description))
                         .toString()
 
                 val placeGeoPoint: GeoPoint =
-                    model.main_info?.get(context.getString(R.string.firestore_field_location)) as GeoPoint
+                    model.main_info?.get(context?.getString(R.string.firestore_field_location)) as GeoPoint
                 val placeLocation = Location("")
 
                 placeLocation.latitude = placeGeoPoint.latitude
@@ -105,7 +111,7 @@ class PlaceAdapter(
                 val imagesList = model.images
 
                 if (imagesList.size > 0) {
-                    Glide.with(context)
+                    Glide.with(context!!)
                         .load(imagesList[0])
                         .into(binding.imageView)
                 } else {

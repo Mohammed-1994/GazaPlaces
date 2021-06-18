@@ -6,174 +6,86 @@ import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.widget.RadioButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.Navigation
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
 import com.awad.gazaplace.R
-import com.awad.gazaplace.adapters.MainAdapter
 import com.awad.gazaplace.adapters.PlaceAdapter
-import com.awad.gazaplace.data.PlaceMetaData
-import com.awad.gazaplace.databinding.ActivityMainBinding
+import com.awad.gazaplace.databinding.ActivityHomeBinding
 import com.awad.gazaplace.firebase.FirebaseQueries
 import com.awad.gazaplace.maps.MyLocationUpdatesCallback
 import com.awad.gazaplace.maps.UpdateLocation
-import com.awad.gazaplace.util.Constants
-import com.awad.gazaplace.util.FilterMainResultDialog
-import com.awad.gazaplace.util.NoticeDialogListener
-import com.awad.gazaplace.util.Util
+import com.awad.gazaplace.ui.fragments.home.HomeViewModel
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.StorageReference
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 
-const val TAG = "MainActivity myTag"
-
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), MyLocationUpdatesCallback, NoticeDialogListener {
+class HomeActivity : AppCompatActivity(), MyLocationUpdatesCallback {
+    private lateinit var binding: ActivityHomeBinding
+
+    companion object {
+        private const val TAG = "HomeActivity myTag"
+        private const val MY_PERMISSIONS_REQUEST_LOCATION = 99
+
+    }
 
     @Inject
     lateinit var fireStore: FirebaseFirestore
 
-    @Inject
-    lateinit var storageReference: StorageReference
-
-
-    private lateinit var binding: ActivityMainBinding
-
-    private lateinit var placeAdapter: PlaceAdapter
-    private lateinit var mainAdapter: MainAdapter
-
-    private val util: Util = Util(this)
     private val updateLocation: UpdateLocation = UpdateLocation(this)
-    private var currentLocation = Location("")
-
-    private lateinit var firebaseQueries: FirebaseQueries
+    public var currentLocation = Location("")
     private var gotLocation = false
-    var radius = 10000.0
-    private var city = "غزة"
-    private var type = "مطعم"
-    private var isSearched = false
+    private lateinit var firebaseQueries: FirebaseQueries
+    private lateinit var homeViewModel: HomeViewModel
+    private var city = "null"
+    private var type = "null"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        Log.d(TAG, "onCreate: ")
+        binding = ActivityHomeBinding.inflate(layoutInflater)
+
         setContentView(binding.root)
 
-        checkLocationPermission()
-        firebaseQueries = FirebaseQueries(this, fireStore)
-//        placeAdapter = firebaseQueries.queryWithCityAndType(city, type)
-        mainAdapter = MainAdapter(this)
+        val navView = binding.navView
 
-        binding.recyclerView.adapter = mainAdapter
+
+        checkLocationPermission()
+
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        val appBarConfiguration = AppBarConfiguration.Builder(
+            R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
+        )
+            .build()
+        val navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_home)
+//        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
+        NavigationUI.setupWithNavController(binding.navView, navController)
+
+        firebaseQueries = FirebaseQueries(this)
         updateLocation.getSettingsResult()
         updateLocation.getLastKnownLocation()
-
     }
 
-
-
-
     override fun onLocationUpdated(location: Location) {
+        homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
+        Log.d(TAG, "onLocationUpdated: ")
         if (!gotLocation) {
             this.currentLocation = location
-            Log.d(TAG, "onLocationUpdated: ")
-            firebaseQueries.nearestLocations(location, radius)
-            mainAdapter.findDistance(location)
+            firebaseQueries.nearestLocations(location, 10000.0)
         }
         gotLocation = true
 
     }
-
-
-    fun submitNearestPlacesToAdapter(nearestPlaces: MutableList<PlaceMetaData>) {
-        Log.d(TAG, "submitNearestPlacesToAdapter: ${nearestPlaces.size}")
-        binding.recyclerView.adapter = mainAdapter
-        mainAdapter.submitPlaces(nearestPlaces)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.filter_main_result -> {
-                showFilterResultDialog(Constants.FILTER_MAIN_RESULT_OPTION)
-                return true
-            }
-            R.id.search_area -> {
-                showFilterResultDialog(Constants.SEARCH_AREA_OPTION)
-
-                return true
-            }
-            R.id.advanced_search -> {
-
-                return true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    private fun searchArea(radius: Double) {
-
-        firebaseQueries.searchArea(currentLocation, type, radius)
-    }
-
-    private fun showFilterResultDialog(dialogType: Int) {
-        val dialogFragment = FilterMainResultDialog()
-        val b = Bundle()
-        b.putInt("dialog_type", dialogType)
-        dialogFragment.arguments = b
-        dialogFragment.show(supportFragmentManager, FilterMainResultDialog.TAG)
-    }
-
-
-    fun onCitiesRadioClicked(view: View) {
-        val radio = view as RadioButton
-        this.city = radio.text.toString()
-    }
-
-    fun onTypesRadioClicked(view: View) {
-
-        val radio = view as RadioButton
-        this.type = radio.text.toString()
-        Log.d(TAG, "onTypesRadioClicked: $type")
-    }
-
-    override fun onDialogPositiveClick(dialogType: Int, distance: Double, city:String, type: String) {
-        isSearched = true
-        binding.progressCircular.visibility = VISIBLE
-        if (dialogType == Constants.FILTER_MAIN_RESULT_OPTION)
-            queryWithCityAndType(city, type)
-        else if (dialogType == Constants.SEARCH_AREA_OPTION) {
-
-            this.type = type
-            searchArea(distance)
-        }
-    }
-
-    private fun queryWithCityAndType(city: String, type: String) {
-
-        placeAdapter = firebaseQueries.queryWithCityAndType(city, type)
-        binding.recyclerView.adapter = placeAdapter
-        placeAdapter.startListening()
-        placeAdapter.findDistance(this.currentLocation)
-
-
-    }
-
-    override fun onDialogNegativeClick(dialog: DialogFragment) {
-        dialog.dismiss()
-    }
-
-    // *********     ****///***///***///**/     *********//////////
 
     override fun onResume() {
         super.onResume()
@@ -189,34 +101,19 @@ class MainActivity : AppCompatActivity(), MyLocationUpdatesCallback, NoticeDialo
 
     override fun onStop() {
         super.onStop()
-        try {
-            placeAdapter.stopListening()
-        } catch (e: UninitializedPropertyAccessException) {
-        }
+        updateLocation.removeLocationUpdates()
+
 
     }
 
-    override fun onBackPressed() {
-
-        if (isSearched) {
-            recreate()
-            isSearched = false
-        } else
-            super.onBackPressed()
+    fun onTypeRadioGroupClicked(view: View) {
+        type = (view as RadioButton).text.toString()
     }
 
-    fun setProgressBar(placesCount: Int) {
-        binding.progressCircular.visibility = GONE
-        if (placesCount > 0)
-            binding.noResultTextView.visibility = GONE
-        else
-            binding.noResultTextView.visibility = VISIBLE
+    fun onCityRadioGroupClicked(view: View) {
+        city = (view as RadioButton).text.toString()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
-        return true
-    }
 
     // *********     ****///***///***///**/     *********//////////
     // location permissions ************
@@ -305,11 +202,13 @@ class MainActivity : AppCompatActivity(), MyLocationUpdatesCallback, NoticeDialo
         }
     }
 
-    companion object {
-        private const val MY_PERMISSIONS_REQUEST_LOCATION = 99
+    fun searchFilter(): PlaceAdapter {
+        return firebaseQueries.queryWithCityAndType(city, type)
+    }
+
+    fun searchArea(radius: Double) {
+        firebaseQueries.searchArea(currentLocation, type, radius)
     }
 
 
 }
-
-

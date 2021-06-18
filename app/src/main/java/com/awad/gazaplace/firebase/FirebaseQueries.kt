@@ -3,11 +3,15 @@ package com.awad.gazaplace.firebase
 import android.content.Context
 import android.location.Location
 import android.util.Log
+import androidx.lifecycle.ViewModelProvider
 import com.awad.gazaplace.R
 import com.awad.gazaplace.adapters.PlaceAdapter
 import com.awad.gazaplace.data.PlaceMetaData
 import com.awad.gazaplace.data.RestaurantModel
-import com.awad.gazaplace.ui.MainActivity
+import com.awad.gazaplace.maps.MyLocationUpdatesCallback
+import com.awad.gazaplace.ui.HomeActivity
+import com.awad.gazaplace.ui.fragments.area_search.AreaSearchViewModel
+import com.awad.gazaplace.ui.fragments.home.HomeViewModel
 import com.firebase.geofire.GeoFireUtils
 import com.firebase.geofire.GeoLocation
 import com.firebase.geofire.GeoQueryBounds
@@ -21,7 +25,14 @@ import dagger.hilt.android.qualifiers.ActivityContext
 
 private const val TAG = "FirebaseQueries, myTag"
 
-class FirebaseQueries(@ActivityContext var context: Context, var fireStore: FirebaseFirestore) {
+class FirebaseQueries(@ActivityContext var context: Context) {
+    private var locationUpdatesCallback: MyLocationUpdatesCallback =
+        context as MyLocationUpdatesCallback
+    private var fireStore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val homeViewModel =
+        ViewModelProvider(context as HomeActivity).get(HomeViewModel::class.java)
+    private val areaSearchViewModel =
+        ViewModelProvider(context as HomeActivity).get(AreaSearchViewModel::class.java)
 
     /**
      * get the nearest places with specific radius.
@@ -38,7 +49,7 @@ class FirebaseQueries(@ActivityContext var context: Context, var fireStore: Fire
 
         val bounds: List<GeoQueryBounds> = GeoFireUtils.getGeoHashQueryBounds(
             center,
-            radius 
+            radius
         )
         val tasks: MutableList<Task<QuerySnapshot>> = ArrayList()
         for (b in bounds) {
@@ -73,8 +84,12 @@ class FirebaseQueries(@ActivityContext var context: Context, var fireStore: Fire
 
                 }
 
-                (context as MainActivity).submitNearestPlacesToAdapter(matchingDocs)
+//                (context as MainActivity).submitNearestPlacesToAdapter(matchingDocs)
                 Log.d(TAG, "nearestLocations: result size = ${matchingDocs.size}")
+
+
+                homeViewModel.setData(matchingDocs)
+
             }
 
     }
@@ -89,6 +104,7 @@ class FirebaseQueries(@ActivityContext var context: Context, var fireStore: Fire
             FirestoreRecyclerOptions.Builder<RestaurantModel>()
                 .setQuery(q, RestaurantModel::class.java)
                 .build()
+
 
         return PlaceAdapter(options, context)
 
@@ -142,8 +158,9 @@ class FirebaseQueries(@ActivityContext var context: Context, var fireStore: Fire
                     }
 
                 }
-                Log.d(TAG, "searchArea: size = ${matchingDocs.size}")
-                (context as MainActivity).submitNearestPlacesToAdapter(matchingDocs)
+                areaSearchViewModel.setData(matchingDocs)
+
+
             }
     }
 }

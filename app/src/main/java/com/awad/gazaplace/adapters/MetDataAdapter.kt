@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.awad.gazaplace.R
 import com.awad.gazaplace.data.PlaceMetaData
 import com.awad.gazaplace.databinding.PlaceItemBinding
-import com.awad.gazaplace.ui.MainActivity
+import com.awad.gazaplace.ui.HomeActivity
 import com.bumptech.glide.Glide
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
@@ -52,10 +52,7 @@ class MetDataAdapter(
     override fun onDataChanged() {
         super.onDataChanged()
         notifyDataSetChanged()
-        Log.d(TAG, "onDataChanged: size = $itemCount")
 
-        if (context is MainActivity)
-            (context as MainActivity).setProgressBar(itemCount)
 
     }
 
@@ -94,7 +91,7 @@ class MetDataAdapter(
     }
 
     private fun getImages(model: PlaceMetaData, holder: MetDataAdapter.MetaDataViewHolder) {
-        (context as MainActivity).fireStore.collection(context.getString(R.string.firestore_collection_cities))
+        (context as HomeActivity).fireStore.collection(context.getString(R.string.firestore_collection_cities))
             .document(model.city)
             .collection(model.type)
             .document(model.ref_id).get()
