@@ -42,8 +42,8 @@ class HomeActivity : AppCompatActivity(), MyLocationUpdatesCallback {
     @Inject
     lateinit var fireStore: FirebaseFirestore
 
-    private val updateLocation: UpdateLocation = UpdateLocation(this)
-    public var currentLocation = Location("")
+    private val updateLocation = UpdateLocation(this)
+    var currentLocation = Location("")
     private var gotLocation = false
     private lateinit var firebaseQueries: FirebaseQueries
     private lateinit var homeViewModel: HomeViewModel

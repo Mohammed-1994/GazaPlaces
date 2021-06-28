@@ -1,6 +1,7 @@
 package com.awad.gazaplace.ui
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.util.Log
 import android.view.Gravity.CENTER
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.LinearLayout
@@ -58,10 +60,9 @@ class PlaceActivity : AppCompatActivity() {
 
             if (binding.mainLayout.visibility == VISIBLE) {
                 binding.mainLayout.visibility = GONE
-                binding.root.scrollTo(0,0)
+                binding.root.scrollTo(0, 0)
 
-            }
-            else {
+            } else {
                 scroll = true
                 binding.mainLayout.visibility = VISIBLE
             }
@@ -71,8 +72,8 @@ class PlaceActivity : AppCompatActivity() {
         binding.mainLayout.tag = binding.mainLayout.visibility
 
         binding.mainLayout.viewTreeObserver.addOnGlobalLayoutListener {
-            val  newVisibility = binding.mainLayout.visibility
-            if (binding.mainLayout.tag as Int != newVisibility){
+            val newVisibility = binding.mainLayout.visibility
+            if (binding.mainLayout.tag as Int != newVisibility) {
                 if (scroll) {
                     binding.root.arrowScroll(ScrollView.FOCUS_DOWN)
                     scroll = false
@@ -198,7 +199,7 @@ class PlaceActivity : AppCompatActivity() {
         binding.placeNameText.text = currentPlace.main_info?.get("name").toString()
         binding.placeAddressText.text = currentPlace.main_info?.get("address").toString()
         binding.placeDescriptionText.text = currentPlace.main_info?.get("description").toString()
-        binding.placeWebsiteText.text = currentPlace.main_info?.get("website").toString()
+//        binding.placeWebsiteText.text = currentPlace.main_info?.get("website").toString()
 
 
     }
@@ -237,6 +238,27 @@ class PlaceActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "PlaceActivity, myTag"
+    }
+
+    fun onWebsiteClick(view: View) {
+        Log.d(TAG, "onWebsiteClick:")
+        val intent =
+            newFacebookIntent(packageManager, currentPlace.main_info?.get("website").toString())
+        startActivity(intent)
+    }
+
+
+    fun newFacebookIntent(pm: PackageManager, url: String): Intent? {
+        var uri = Uri.parse(url)
+        try {
+            val applicationInfo = pm.getApplicationInfo("com.facebook.katana", 0)
+            if (applicationInfo.enabled) {
+                // http://stackoverflow.com/a/24547437/1048340
+                uri = Uri.parse("fb://facewebmodal/f?href=$url")
+            }
+        } catch (ignored: PackageManager.NameNotFoundException) {
+        }
+        return Intent(Intent.ACTION_VIEW, uri)
     }
 
 }
