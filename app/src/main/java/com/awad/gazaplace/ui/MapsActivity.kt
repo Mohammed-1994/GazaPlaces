@@ -2,10 +2,12 @@ package com.awad.gazaplace.ui
 
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.awad.gazaplace.R
+import com.awad.gazaplace.data.PlaceMetaDataForMap
 import com.awad.gazaplace.databinding.ActivityMapsBinding
 import com.awad.gazaplace.maps.MyLocationUpdatesCallback
 import com.awad.gazaplace.maps.UpdateLocation
@@ -21,43 +23,76 @@ private const val TAG = "MapsActivity myTag"
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, MyLocationUpdatesCallback {
 
+    lateinit var updateLocation: UpdateLocation
 
     private var gotLocation = false
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     private var lat = 0.0
+    private var places = ArrayList<PlaceMetaDataForMap>()
     private var lng = 0.0
     private var placeName = ""
     var currentLocation = Location("")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
+        Log.d(TAG, "onCreate: ")
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         lat = intent.getDoubleExtra("lat", 0.0)
         lng = intent.getDoubleExtra("lng", 0.0)
-        placeName = intent.getStringExtra("name")!!
+
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        UpdateLocation(this).getSettingsResult()
-        UpdateLocation(this).getLastKnownLocation()
+        updateLocation = UpdateLocation(this)
+        updateLocation.getSettingsResult()
+        updateLocation.getLastKnownLocation()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.title = placeName
+
+        if (intent.hasExtra("name")) {
+
+            placeName = intent.getStringExtra("name")!!
+            supportActionBar?.title = placeName
+        } else if (intent.hasExtra("places")) {
+
+            placeName = "أماكن بالقرب"
+            supportActionBar?.title = placeName
+
+        }
+
 
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
+        Log.d(TAG, "onMapReady: ")
         mMap = googleMap
 
         // Add a marker in place location and move the camera
-        val placeLocation = LatLng(lat, lng)
-        mMap.addMarker(MarkerOptions().position(placeLocation).title(placeName))
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(placeLocation, 15f))
+        if (intent.hasExtra("places")) {
+            Log.d(TAG, "onMapReady: ${places.size}")
+            places = intent.getParcelableArrayListExtra("places")!!
+            for (place in places) {
+                val placeLocation = LatLng(place.lat, place.lng)
+                mMap.addMarker(MarkerOptions().position(placeLocation).title(place.name))
+            }
+            val myLatLng = LatLng(currentLocation.latitude, currentLocation.longitude)
+        } else {
+            val placeLocation = LatLng(lat, lng)
+            mMap.addMarker(MarkerOptions().position(placeLocation).title(placeName))
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(placeLocation, 15f))
+        }
 
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop: ")
+        mMap.clear()
     }
 
     fun moveToMyLocation(view: View) {
@@ -72,11 +107,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, MyLocationUpdatesC
     }
 
     override fun onLocationUpdated(location: Location) {
+
+        this.currentLocation = location
+        val myLatLng = LatLng(location.latitude, location.longitude)
+
         if (!gotLocation) {
-            this.currentLocation = location
-            val myLatLng = LatLng(location.latitude, location.longitude)
             mMap.addMarker(MarkerOptions().position(myLatLng).title("أنت هنا"))
         }
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, 13f))
         gotLocation = true
 
     }

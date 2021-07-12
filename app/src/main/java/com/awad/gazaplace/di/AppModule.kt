@@ -22,5 +22,4 @@ object AppModule {
     @Singleton
     fun providesStorageReference(): StorageReference = FirebaseStorage.getInstance().reference
 
-
 }

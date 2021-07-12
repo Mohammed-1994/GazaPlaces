@@ -7,32 +7,36 @@ import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Looper
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
+import dagger.hilt.android.qualifiers.ActivityContext
 
 private const val TAG = "UpdateLocation myTag"
 const val REQUEST_CHECK_SETTINGS = 1000
 
-class UpdateLocation @Inject constructor(@ApplicationContext val context: Context) {
+
+class UpdateLocation
+
+
+constructor(@ActivityContext val context: Context) {
+
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     lateinit var listener: MyLocationUpdatesCallback
 
     private lateinit var locationCallback: LocationCallback
 
+    var mLocation = Location("")
     fun updateLocation() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
                 locationResult ?: return
                 for (location in locationResult.locations) {
-                    Log.d(TAG, "onLocationResult: result not null,")
+                    mLocation = location
                     listener = context as MyLocationUpdatesCallback
                     listener.onLocationUpdated(location)
                     removeLocationUpdates()
@@ -44,7 +48,6 @@ class UpdateLocation @Inject constructor(@ApplicationContext val context: Contex
     }
 
     fun getLastKnownLocation() {
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
         if (ActivityCompat.checkSelfPermission(
                 context,
@@ -57,16 +60,14 @@ class UpdateLocation @Inject constructor(@ApplicationContext val context: Contex
             return
         fusedLocationClient.lastLocation.addOnCompleteListener {
             if (!it.isSuccessful) {
-                Log.e(TAG, "getLastKnownLocation: Error", it.exception)
                 updateLocation()
             } else {
                 if (it.result != null) {
-                    Log.d(TAG, "getLastKnownLocation: last location not null")
+                    mLocation = it.result
                     listener = context as MyLocationUpdatesCallback
                     listener.onLocationUpdated(it.result)
 
                 } else {
-                    Log.d(TAG, "getLastKnownLocation: last location is null")
                     updateLocation()
                 }
             }
@@ -74,7 +75,7 @@ class UpdateLocation @Inject constructor(@ApplicationContext val context: Contex
     }
 
     private fun startLocationUpdates() {
-        Log.d(TAG, "startLocationUpdates: ")
+        context
         if (ActivityCompat.checkSelfPermission(
                 context,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -94,7 +95,6 @@ class UpdateLocation @Inject constructor(@ApplicationContext val context: Contex
 
 
     private fun createLocationRequest(): LocationRequest? {
-        Log.d(TAG, "createLocationRequest: ")
 
         return LocationRequest.create()?.apply {
             interval = 10000
@@ -139,12 +139,7 @@ class UpdateLocation @Inject constructor(@ApplicationContext val context: Contex
     }
 
     fun removeLocationUpdates() {
-        Log.d(TAG, "removeLocationUpdates: ")
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
-}
-
-interface MyLocationUpdatesCallback {
-    fun onLocationUpdated(location: Location)
 }

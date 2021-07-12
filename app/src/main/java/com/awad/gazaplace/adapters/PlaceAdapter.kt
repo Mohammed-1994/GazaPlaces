@@ -18,7 +18,6 @@ import com.awad.gazaplace.ui.fragments.filter_search.FilterSearchViewModel
 import com.bumptech.glide.Glide
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
-import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.qualifiers.ActivityContext
 
@@ -44,15 +43,11 @@ class PlaceAdapter(
     override fun onDataChanged() {
         super.onDataChanged()
         notifyDataSetChanged()
-        Log.d(TAG, "onDataChanged: $itemCount")
+
         filterSearchViewModel.setData(this)
 
     }
 
-    override fun onError(e: FirebaseFirestoreException) {
-        super.onError(e)
-        Log.e(TAG, "onError: ", e)
-    }
 
     override fun onBindViewHolder(
         holder: PlaceViewHolder,
@@ -139,4 +134,6 @@ class PlaceAdapter(
             .inflate(LayoutInflater.from(parent.context), parent, false)
         return PlaceViewHolder(view)
     }
+
+
 }

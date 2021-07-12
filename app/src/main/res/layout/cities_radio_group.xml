@@ -27,7 +27,7 @@
             android:onClick="onCityRadioGroupClicked"
 
             android:padding="4dp"
-            android:text="@string/kahan_yunis" />
+            android:text="@string/khan_yunis" />
 
         <RadioButton
 

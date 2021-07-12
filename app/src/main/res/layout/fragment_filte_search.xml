@@ -6,85 +6,17 @@
     android:layout_height="match_parent"
     tools:context=".ui.fragments.filter_search.DashboardFragment">
 
-
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        android:layout_width="wrap_content"
-        android:visibility="gone"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
-
-    <TextView
-        android:id="@+id/no_result_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="@string/no_result"
-        android:textSize="22sp"
-        android:visibility="gone" />
-    <TextView
-        android:id="@+id/search_hint_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="@string/search_hint"
-        android:textSize="22sp" />
-
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+    <GridView
+        android:id="@+id/gridview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/city_scroll"
-        android:layout_centerInParent="true"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/place_item" />
-
-    <HorizontalScrollView
-        android:id="@+id/type_scroll"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_toEndOf="@id/search_button"
-        android:paddingEnd="8dp"
-        android:scrollbars="none">
-
-        <include
-            android:id="@+id/types_radio_group"
-            layout="@layout/types_radio_group" />
-    </HorizontalScrollView>
-
-    <View
-        android:id="@+id/view"
-        android:layout_width="wrap_content"
-        android:layout_height="1dp"
-        android:layout_below="@id/type_scroll"
-        android:layout_toEndOf="@id/search_button"
-        android:background="@android:color/darker_gray" />
+        android:layout_margin="10dp"
+        android:horizontalSpacing="1dp"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="1dp"
+        tools:listitem="@layout/grid_list_item" />
 
 
-    <HorizontalScrollView
-        android:id="@+id/city_scroll"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/view"
-        android:layout_marginTop="12dp"
-        android:layout_toEndOf="@id/search_button"
-        android:paddingEnd="8dp"
-        android:scrollbars="none">
-
-        <include
-            android:id="@+id/cities_radio_group"
-            layout="@layout/cities_radio_group" />
-    </HorizontalScrollView>
-
-    <ImageButton
-        android:id="@+id/search_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="36dp"
-
-        android:src="@drawable/ic_baseline_search_24" />
 
 </RelativeLayout>

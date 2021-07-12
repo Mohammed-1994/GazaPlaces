@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.RadioButton
 import android.widget.Toast
@@ -42,14 +41,18 @@ class HomeActivity : AppCompatActivity(), MyLocationUpdatesCallback {
     @Inject
     lateinit var fireStore: FirebaseFirestore
 
-    private val updateLocation = UpdateLocation(this)
-    var currentLocation = Location("")
     private var gotLocation = false
-    private lateinit var firebaseQueries: FirebaseQueries
+
+    @Inject
+    lateinit var firebaseQueries: FirebaseQueries
+
+    @Inject
+    lateinit var updateLocation: UpdateLocation
+
     private lateinit var homeViewModel: HomeViewModel
     private var city = "null"
     private var type = "null"
-
+    var currentLocation = Location("")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
@@ -58,11 +61,8 @@ class HomeActivity : AppCompatActivity(), MyLocationUpdatesCallback {
 
         val navView = binding.navView
 
-
         checkLocationPermission()
 
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration.Builder(
             R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
         )
@@ -71,21 +71,8 @@ class HomeActivity : AppCompatActivity(), MyLocationUpdatesCallback {
 //        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
         NavigationUI.setupWithNavController(binding.navView, navController)
 
-        firebaseQueries = FirebaseQueries(this)
-        updateLocation.getSettingsResult()
-        updateLocation.getLastKnownLocation()
     }
-
-    override fun onLocationUpdated(location: Location) {
-        homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
-        Log.d(TAG, "onLocationUpdated: ")
-        if (!gotLocation) {
-            this.currentLocation = location
-            firebaseQueries.nearestLocations(location, 10000.0)
-        }
-        gotLocation = true
-
-    }
+//
 
     override fun onResume() {
         super.onResume()
@@ -130,9 +117,6 @@ class HomeActivity : AppCompatActivity(), MyLocationUpdatesCallback {
                     Manifest.permission.ACCESS_FINE_LOCATION
                 )
             ) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
                 AlertDialog.Builder(this)
                     .setTitle("Location Permission Needed")
                     .setMessage("This app needs the Location permission, please accept to use location functionality")
@@ -188,7 +172,7 @@ class HomeActivity : AppCompatActivity(), MyLocationUpdatesCallback {
                             Manifest.permission.ACCESS_FINE_LOCATION
                         ) == PackageManager.PERMISSION_GRANTED
                     ) {
-                        updateLocation.getLastKnownLocation()
+//                        updateLocation.getLastKnownLocation()
                     }
 
                 } else {
@@ -206,8 +190,24 @@ class HomeActivity : AppCompatActivity(), MyLocationUpdatesCallback {
         return firebaseQueries.queryWithCityAndType(city, type)
     }
 
-    fun searchArea(radius: Double) {
-        firebaseQueries.searchArea(currentLocation, type, radius)
+    fun searchArea(type: String, radius: Double) {
+
+        firebaseQueries.searchArea(updateLocation.mLocation, type, radius)
+    }
+
+    override fun onLocationUpdated(location: Location) {
+
+        this.currentLocation = location
+        homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
+
+        if (!gotLocation) {
+            this.currentLocation = location
+            updateLocation.mLocation = location
+            firebaseQueries.nearestLocations(updateLocation.mLocation, 10000.0)
+
+        }
+        gotLocation = true
+
     }
 
 

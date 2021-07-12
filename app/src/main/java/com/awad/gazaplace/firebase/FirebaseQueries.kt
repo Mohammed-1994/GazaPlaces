@@ -8,7 +8,6 @@ import com.awad.gazaplace.R
 import com.awad.gazaplace.adapters.PlaceAdapter
 import com.awad.gazaplace.data.PlaceMetaData
 import com.awad.gazaplace.data.RestaurantModel
-import com.awad.gazaplace.maps.MyLocationUpdatesCallback
 import com.awad.gazaplace.ui.HomeActivity
 import com.awad.gazaplace.ui.fragments.area_search.AreaSearchViewModel
 import com.awad.gazaplace.ui.fragments.home.HomeViewModel
@@ -22,12 +21,13 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import dagger.hilt.android.qualifiers.ActivityContext
+import javax.inject.Inject
 
 private const val TAG = "FirebaseQueries, myTag"
 
-class FirebaseQueries(@ActivityContext var context: Context) {
-    private var locationUpdatesCallback: MyLocationUpdatesCallback =
-        context as MyLocationUpdatesCallback
+class FirebaseQueries  @Inject constructor(@ActivityContext var context: Context) {
+//    private var locationUpdatesCallback: MyLocationUpdatesCallback =
+//        context as MyLocationUpdatesCallback
     private var fireStore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val homeViewModel =
         ViewModelProvider(context as HomeActivity).get(HomeViewModel::class.java)
@@ -43,7 +43,7 @@ class FirebaseQueries(@ActivityContext var context: Context) {
      */
 
     fun nearestLocations(center: Location, radius: Double) {
-        Log.d(TAG, "nearestLocations: radius = $radius")
+        Log.d(TAG, "nearestLocations: radius = $radius, ${center.longitude}, ${center.latitude}")
         val matchingDocs: MutableList<PlaceMetaData> = ArrayList()
         val center = GeoLocation(center.latitude, center.longitude)
 
@@ -113,7 +113,7 @@ class FirebaseQueries(@ActivityContext var context: Context) {
 
 
     fun searchArea(location: Location, type: String, radius: Double) {
-        Log.d(TAG, "searchArea: ")
+        Log.d(TAG, "searchArea: $type, $radius, $location ")
         val matchingDocs: MutableList<PlaceMetaData> = ArrayList()
         val center = GeoLocation(location.latitude, location.longitude)
 
@@ -158,6 +158,7 @@ class FirebaseQueries(@ActivityContext var context: Context) {
                     }
 
                 }
+                Log.d(TAG, "searchArea: size = ${matchingDocs.size}")
                 areaSearchViewModel.setData(matchingDocs)
 
 

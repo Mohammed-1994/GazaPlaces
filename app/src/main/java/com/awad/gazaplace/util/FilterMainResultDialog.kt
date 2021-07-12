@@ -142,7 +142,7 @@ class FilterMainResultDialog : DialogFragment() {
         val cities = arrayOf(
             getString(R.string.gaza),
             getString(R.string.north),
-            getString(R.string.kahan_yunis),
+            getString(R.string.khan_yunis),
             getString(R.string.central),
             getString(R.string.rafah),
         )

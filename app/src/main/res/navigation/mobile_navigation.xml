@@ -15,11 +15,55 @@
         android:id="@+id/navigation_dashboard"
         android:name="com.awad.gazaplace.ui.fragments.filter_search.DashboardFragment"
         android:label="@string/title_advanced_search"
-        tools:layout="@layout/fragment_filte_search" />
+        tools:layout="@layout/fragment_filte_search">
+        <action
+            android:id="@+id/startMyFragment"
+            app:destination="@+id/navigation_fragment_container">
+            <argument
+                android:name="type"
+                android:defaultValue="مطعم"
+                app:argType="string" />
+
+        </action>
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.awad.gazaplace.ui.fragments.area_search.AreaSearchFragment"
         android:label="@string/title_area"
-        tools:layout="@layout/fragment_area_search" />
+        tools:layout="@layout/fragment_area_search">
+        <action
+            android:id="@+id/startMyFragment"
+            app:destination="@+id/navigation_all_type_fragment">
+            <argument
+                android:name="type"
+                android:defaultValue="مطعم"
+                app:argType="string" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_fragment_container"
+        android:name="com.awad.gazaplace.ui.fragments.viewpager.ViewPagerContainerFragment"
+        android:label="@string/title_area"
+        tools:layout="@layout/fragment_view_pager_container">
+        <argument
+            android:name="type"
+            android:defaultValue="مطعم"
+            app:argType="string" />
+
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/navigation_all_type_fragment"
+        android:name="com.awad.gazaplace.ui.fragments.AllTypesFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/fragment_all_types" >
+        <argument
+            android:name="type"
+            android:defaultValue="مطعم"
+            app:argType="string"/>
+    </fragment>
+
 </navigation>

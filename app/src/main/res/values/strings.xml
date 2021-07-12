@@ -6,7 +6,7 @@
     <string name="chose_type">حدد نوع المكان</string>
     <string name="north">الشمال</string>
     <string name="rafah">رفح</string>
-    <string name="kahan_yunis">خان يونس</string>
+    <string name="khan_yunis">خان يونس</string>
     <string name="central">الوسطى</string>
     <string name="gaza">غزة</string>
     <string name="restaurant">مطعم</string>
@@ -40,6 +40,8 @@
     <string name="title_home">الرئيسية</string>
     <string name="title_advanced_search">مخصص</string>
     <string name="title_area">بالقرب</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>
