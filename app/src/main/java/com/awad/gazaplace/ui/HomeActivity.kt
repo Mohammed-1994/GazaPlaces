@@ -61,6 +61,7 @@ class HomeActivity : AppCompatActivity(), MyLocationUpdatesCallback {
 
         val navView = binding.navView
 
+
         checkLocationPermission()
 
         val appBarConfiguration = AppBarConfiguration.Builder(

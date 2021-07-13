@@ -82,4 +82,6 @@ class KhanFragment(val type: String) : Fragment() {
         adapter.startListening()
 
     }
+
+
 }

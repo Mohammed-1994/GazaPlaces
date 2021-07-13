@@ -51,8 +51,6 @@ class MainAdapter(@ActivityContext var context: Context) :
             try {
                 binding.address.text = currentPlace.address
                 binding.title.text = currentPlace.name
-                binding.description.text = currentPlace.ref_id
-
                 showDistance(currentPlace, this)
 
                 getImages(currentPlace, holder)
