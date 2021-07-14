@@ -4,12 +4,12 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -44,7 +44,7 @@ private const val TAG = "AllTypesFragment myTag"
  */
 
 @AndroidEntryPoint
-class AllTypesFragment  : Fragment() {
+class AllTypesFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var binding: FragmentAllTypesBinding? = null
     private lateinit var mainAdapter: MainAdapter
@@ -82,7 +82,7 @@ class AllTypesFragment  : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         createMenu()
-        areaSearch()
+        areaSearch(5000.0)
         binding!!.mapFabBtn.setOnClickListener {
 
             val intent = Intent(requireContext(), MapsActivity::class.java)
@@ -98,9 +98,9 @@ class AllTypesFragment  : Fragment() {
 
     private fun createMenu() {
         val list = mutableListOf(
-            PowerMenuItem("5"),
-            PowerMenuItem("10"),
-            PowerMenuItem("15"),
+            PowerMenuItem("5 KM"),
+            PowerMenuItem("10 KM"),
+            PowerMenuItem("15 KM"),
         )
         val powerMenu = PowerMenu.Builder(requireContext())
             .addItemList(list) // list has "Novel", "Poerty", "Art"
@@ -112,7 +112,7 @@ class AllTypesFragment  : Fragment() {
             .setTextTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD))
             .setSelectedTextColor(Color.WHITE)
             .setMenuColor(Color.WHITE)
-            .setSelectedMenuColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
+            .setSelectedMenuColor(ContextCompat.getColor(requireContext(), R.color.purple_200))
             .setLifecycleOwner(viewLifecycleOwner)
             .build()
 
@@ -121,7 +121,20 @@ class AllTypesFragment  : Fragment() {
 
 
             OnMenuItemClickListener<PowerMenuItem?> { position, item ->
-                Toast.makeText(requireContext(), item.title, Toast.LENGTH_SHORT).show()
+                var radius = 5000.0
+                when (position) {
+                    0 -> {
+                        radius = 5000.0
+                    }
+                    1 -> {
+                        radius = 10000.0
+                    }
+                    2 -> {
+                        radius = 15000.0
+                    }
+                }
+                areaSearch(radius)
+
                 powerMenu.selectedPosition = position // change selected item
                 powerMenu.dismiss()
             }
@@ -132,13 +145,14 @@ class AllTypesFragment  : Fragment() {
     }
 
 
-    private fun areaSearch() {
+    private fun areaSearch(radius: Double) {
+        binding?.recyclerView?.visibility = GONE
+        binding?.progressBar?.visibility = VISIBLE
         places.clear()
 
         list.clear()
         binding!!.mapFabBtn.visibility = View.VISIBLE
-        Log.d(TAG, "areaSearch: ${updateLocation.mLocation}")
-        firebaseQueries.searchArea(updateLocation.mLocation,type, 5000.0)
+        firebaseQueries.searchArea(updateLocation.mLocation, type, radius)
         areaObserver = Observer<MutableList<PlaceMetaData>> {
             updateUi(it)
         }
@@ -164,6 +178,7 @@ class AllTypesFragment  : Fragment() {
 
         list.clear()
         places!!
+        binding?.recyclerView?.visibility = VISIBLE
         this.places.addAll(places)
 
         binding!!.progressBar.visibility = View.GONE

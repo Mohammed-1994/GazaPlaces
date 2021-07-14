@@ -89,6 +89,8 @@ class MainAdapter(@ActivityContext var context: Context) :
             .document(model.ref_id).get()
             .addOnCompleteListener {
                 if (it.isSuccessful) {
+                    holder.binding.description.text =
+                        (it.result["main_info"] as HashMap<String, Any>)["description"].toString()
                     var imagesList = ArrayList<String>()
                     if (it.result[context.getString(R.string.firestore_field_images)] != null)
                         imagesList = (it.result["images"]) as ArrayList<String>

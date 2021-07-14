@@ -6,7 +6,6 @@
     android:layout_height="wrap_content"
 
     android:layout_marginBottom="4dp"
-    app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="16dp"
     app:cardElevation="12dp"
     app:cardMaxElevation="12dp"
@@ -43,6 +42,27 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/title" />
 
+        <com.smarteist.autoimageslider.SliderView
+            android:id="@+id/imageSlider"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            app:sliderAnimationDuration="600"
+            app:sliderAutoCycleDirection="back_and_forth"
+            app:sliderAutoCycleEnabled="true"
+            app:sliderIndicatorAnimationDuration="600"
+            app:sliderIndicatorGravity="center_horizontal|bottom"
+            app:sliderIndicatorMargin="15dp"
+            app:sliderIndicatorOrientation="horizontal"
+            app:sliderIndicatorPadding="3dp"
+            app:sliderIndicatorRadius="2dp"
+            app:sliderIndicatorSelectedColor="#5A5A5A"
+            app:sliderIndicatorUnselectedColor="#FFF"
+            app:sliderScrollTimeInSec="4"
+            app:sliderStartAutoCycle="true"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/title" />
         <TextView
             android:id="@+id/address"
             android:layout_width="wrap_content"
@@ -56,13 +76,13 @@
 
         <TextView
             android:id="@+id/description"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
 
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:text="description"
+            android:gravity="right"
             android:maxLines="1"
-            android:textColor="@color/black"
+            android:text="description"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/distance"
             app:layout_constraintHorizontal_bias="0.0"
@@ -78,7 +98,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="8dp"
             android:text="distance"
-            android:textColor="@color/black"
+            android:textColor="@color/purple_700"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toEndOf="@+id/address"

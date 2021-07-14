@@ -11,7 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_margin="10dp"
         android:horizontalSpacing="1dp"
         android:numColumns="auto_fit"
         android:verticalSpacing="1dp"
