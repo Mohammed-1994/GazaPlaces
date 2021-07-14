@@ -32,6 +32,7 @@ class PlaceActivity : AppCompatActivity() {
 
     @Inject
     lateinit var fireStore: FirebaseFirestore
+
     lateinit var binding: ActivityPlaceBinding
 
     private var currentPlace = RestaurantModel()
@@ -191,6 +192,9 @@ class PlaceActivity : AppCompatActivity() {
 
         val sliderView = binding.imageSlider
         val sliderAdapter = SliderAdapter(this)
+        if (imagesList.size == 0) {
+            imagesList.add("https://firebasestorage.googleapis.com/v0/b/add-place-d0852.appspot.com/o/placeholder.png?alt=media&token=149eda64-4708-4eb5-9763-701d5e1c7ef5")
+        }
         sliderAdapter.renewItems(imagesList)
         sliderView.setSliderAdapter(sliderAdapter)
         sliderView.startAutoCycle();

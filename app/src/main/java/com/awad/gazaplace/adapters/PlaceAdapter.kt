@@ -10,12 +10,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.awad.gazaplace.R
 import com.awad.gazaplace.adapters.PlaceAdapter.PlaceViewHolder
+import com.awad.gazaplace.data.RefCityType
 import com.awad.gazaplace.data.RestaurantModel
 import com.awad.gazaplace.databinding.PlaceItemBinding
 import com.awad.gazaplace.ui.HomeActivity
 import com.awad.gazaplace.ui.PlaceActivity
 import com.awad.gazaplace.ui.fragments.filter_search.FilterSearchViewModel
-import com.bumptech.glide.Glide
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.firestore.GeoPoint
@@ -58,22 +58,16 @@ class PlaceAdapter(
 
         with(holder) {
 
-
+            val ref = snapshots.getSnapshot(position).id
+            val type = model.main_info?.get(context?.getString(R.string.firestore_field_type))
+                .toString()
+            val city = model.main_info?.get(context?.getString(R.string.firestore_field_city))
+                .toString()
             binding.root.setOnClickListener {
                 val intent = Intent(context, PlaceActivity::class.java)
                 intent.putExtra("ref", snapshots.getSnapshot(position).id)
-                intent.putExtra(
-                    context?.getString(R.string.firestore_field_type),
-                    context?.let { it1 ->
-                        model.main_info?.get(it1.getString(R.string.firestore_field_type))
-                            .toString()
-                    }
-                )
-                intent.putExtra(
-                    context?.getString(R.string.firestore_field_city),
-                    model.main_info?.get(context?.getString(R.string.firestore_field_city))
-                        .toString()
-                )
+                intent.putExtra(context?.getString(R.string.firestore_field_type), type)
+                intent.putExtra(context?.getString(R.string.firestore_field_city), city)
 
                 context?.startActivity(intent)
             }
@@ -87,9 +81,7 @@ class PlaceAdapter(
                 binding.title.text =
                     model.main_info?.get(context?.getString(R.string.firestore_field_name))
                         .toString()
-                binding.description.text =
-                    model.main_info?.get(context?.getString(R.string.firestore_field_description))
-                        .toString()
+
 
                 val placeGeoPoint: GeoPoint =
                     model.main_info?.get(context?.getString(R.string.firestore_field_location)) as GeoPoint
@@ -103,15 +95,21 @@ class PlaceAdapter(
                     distance = 1F
                 binding.distance.text = "${distance.toInt()}  km"
 
-                val imagesList = model.images
+                var imagesList = ArrayList<String>()
+                imagesList = model.images
 
-                if (imagesList.size > 0) {
-                    Glide.with(context!!)
-                        .load(imagesList[0])
-                        .into(binding.imageView)
-                } else {
+                val sliderView = binding.imageSlider!!
+                val sliderAdapter = SliderAdapter(context!!)
 
+
+                if (imagesList.size == 0) {
+                    Log.d(TAG, "onBindViewHolder: empty")
+                    imagesList.add("https://firebasestorage.googleapis.com/v0/b/add-place-d0852.appspot.com/o/placeholder.png?alt=media&token=149eda64-4708-4eb5-9763-701d5e1c7ef5")
                 }
+                sliderAdapter.renewItems(imagesList)
+                sliderAdapter.setModel(RefCityType(ref, city, type), true)
+                sliderView.setSliderAdapter(sliderAdapter)
+                sliderView.startAutoCycle()
 
 
             } catch (e: NullPointerException) {

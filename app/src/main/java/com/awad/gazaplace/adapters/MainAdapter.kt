@@ -3,15 +3,14 @@ package com.awad.gazaplace.adapters
 import android.content.Context
 import android.content.Intent
 import android.location.Location
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.awad.gazaplace.R
 import com.awad.gazaplace.data.PlaceMetaData
+import com.awad.gazaplace.data.RefCityType
 import com.awad.gazaplace.databinding.PlaceItemBinding
 import com.awad.gazaplace.ui.PlaceActivity
-import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.qualifiers.ActivityContext
@@ -73,7 +72,7 @@ class MainAdapter(@ActivityContext var context: Context) :
     }
 
     fun submitPlaces(matchingDocs: MutableList<PlaceMetaData>) {
-        Log.d(TAG, "submitPlaces: ${matchingDocs.size}")
+
         this.matchingDocs = matchingDocs
 
         notifyDataSetChanged()
@@ -89,13 +88,12 @@ class MainAdapter(@ActivityContext var context: Context) :
             .document(model.ref_id).get()
             .addOnCompleteListener {
                 if (it.isSuccessful) {
-                    holder.binding.description.text =
-                        (it.result["main_info"] as HashMap<String, Any>)["description"].toString()
+
                     var imagesList = ArrayList<String>()
                     if (it.result[context.getString(R.string.firestore_field_images)] != null)
                         imagesList = (it.result["images"]) as ArrayList<String>
 
-                    showImages(imagesList, holder)
+                    showImages(imagesList, holder, model)
 
                 }
 
@@ -106,18 +104,25 @@ class MainAdapter(@ActivityContext var context: Context) :
 
 
     private fun showImages(
-        imagesList: java.util.ArrayList<*>,
-        holder: MainAdapterViewHolder
+        imagesList: java.util.ArrayList<String>,
+        holder: MainAdapterViewHolder,
+        model: PlaceMetaData
     ) {
 
         with(holder) {
-            if (imagesList.size > 0) {
-                Glide.with(context)
-                    .load(imagesList[0])
-                    .into(binding.imageView)
-            } else {
-                binding.imageView.setImageDrawable(context.getDrawable(R.drawable.googleg_disabled_color_18))
+
+            val sliderView = binding.imageSlider!!
+
+            val sliderAdapter = SliderAdapter(context)
+            if (imagesList.size == 0) {
+                imagesList.add("https://firebasestorage.googleapis.com/v0/b/add-place-d0852.appspot.com/o/placeholder.png?alt=media&token=149eda64-4708-4eb5-9763-701d5e1c7ef5")
             }
+            sliderAdapter.renewItems(imagesList)
+            sliderAdapter.setModel(RefCityType(model.ref_id, model.city, model.type), true)
+            sliderView.setSliderAdapter(sliderAdapter)
+            sliderView.startAutoCycle();
+
+
         }
 
     }

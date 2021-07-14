@@ -17,12 +17,17 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 
 private const val TAG = "MapsActivity myTag"
 
+@AndroidEntryPoint
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, MyLocationUpdatesCallback {
 
+
+    @Inject
     lateinit var updateLocation: UpdateLocation
 
     private var gotLocation = false
@@ -48,7 +53,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, MyLocationUpdatesC
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        updateLocation = UpdateLocation(this)
         updateLocation.getSettingsResult()
         updateLocation.getLastKnownLocation()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -107,7 +111,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, MyLocationUpdatesC
     }
 
     override fun onLocationUpdated(location: Location) {
-
+        Log.d(TAG, "onLocationUpdated: ")
         this.currentLocation = location
         val myLatLng = LatLng(location.latitude, location.longitude)
 

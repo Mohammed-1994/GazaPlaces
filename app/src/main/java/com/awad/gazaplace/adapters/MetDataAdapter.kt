@@ -6,12 +6,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
 import com.awad.gazaplace.R
 import com.awad.gazaplace.data.PlaceMetaData
 import com.awad.gazaplace.databinding.PlaceItemBinding
 import com.awad.gazaplace.ui.HomeActivity
-import com.bumptech.glide.Glide
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.firestore.FirebaseFirestore
@@ -77,7 +77,7 @@ class MetDataAdapter(
 
                 binding.address.text = model.address
                 binding.title.text = model.name
-                binding.description.text = model.ref_id
+
 
                 showDistance(model, this)
 
@@ -116,17 +116,23 @@ class MetDataAdapter(
     }
 
     private fun showImages(
-        imagesList: java.util.ArrayList<*>,
+        imagesList: java.util.ArrayList<String>,
         holder: MetaDataViewHolder
     ) {
 
         with(holder) {
+            val sliderView = binding.imageSlider!!
+            val sliderAdapter = SliderAdapter(context)
             if (imagesList.size > 0) {
-                Glide.with(context)
-                    .load(imagesList[0])
-                    .into(binding.imageView)
+                sliderAdapter.renewItems(imagesList)
+                sliderView.setSliderAdapter(sliderAdapter)
+                sliderView.startAutoCycle();
+
             } else {
-                binding.imageView.setImageDrawable(context.getDrawable(R.drawable.googleg_disabled_color_18))
+                sliderView.background = AppCompatResources.getDrawable(context,R.drawable.placeholder)
+
+
+
             }
         }
 
