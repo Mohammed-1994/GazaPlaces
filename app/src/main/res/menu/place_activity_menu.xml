@@ -3,15 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/map_place_menu"
-        android:icon="@drawable/ic_baseline_location_on_24"
-        android:title="عرض على الخريطة"
-        android:tooltipText="عرض على الخريطة"
+        android:icon="@drawable/ic_map"
+        android:title="@string/show_on_map"
+        android:tooltipText="@string/show_on_map"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/call_place_menu"
-        android:icon="@drawable/ic_baseline_call_24"
-        android:tooltipText="اتصال"
-        android:title="اتصال"
+        android:icon="@drawable/ic_phone_call"
+        android:title="@string/make_call"
+        android:tooltipText="@string/make_call"
 
         app:showAsAction="ifRoom" />
 </menu>

@@ -17,19 +17,22 @@ class ViewPagerContainerFragment : Fragment() {
 
     private var binding: FragmentViewPagerContainerBinding? = null
     private lateinit var adapter: ViewPagerFragmentAdapter
+    private var type = "مطعم"
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentViewPagerContainerBinding.inflate(inflater, container, false)
+        type = arguments?.getString("type")!!
+
         return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        var type = arguments?.getString("type")!!
+
         if (type == "مطاعم")
             type = requireContext().getString(R.string.restaurant)
 
@@ -39,15 +42,14 @@ class ViewPagerContainerFragment : Fragment() {
 
         adapter.notifyDataSetChanged()
         binding!!.tabLayout.addTab(binding!!.tabLayout.newTab().setText("غزة"))
-        binding!!.tabLayout.addTab(binding!!.tabLayout.newTab().setText("خان يونس"))
         binding!!.tabLayout.addTab(binding!!.tabLayout.newTab().setText("الشمال"))
+        binding!!.tabLayout.addTab(binding!!.tabLayout.newTab().setText("خان يونس"))
         binding!!.tabLayout.addTab(binding!!.tabLayout.newTab().setText("الوسطى"))
         binding!!.tabLayout.addTab(binding!!.tabLayout.newTab().setText("رفح"))
 
 
-        binding?.tabLayout!!.setOnTabSelectedListener(object : OnTabSelectedListener {
+        binding?.tabLayout!!.addOnTabSelectedListener(object : OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
-//                adapter.city = tab.text.toString()
                 binding!!.pager.currentItem = tab.position
             }
 
@@ -57,7 +59,6 @@ class ViewPagerContainerFragment : Fragment() {
 
         binding!!.pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-//                adapter.city = binding!!.tabLayout.getTabAt(position)?.text.toString()
                 binding!!.tabLayout.selectTab(binding!!.tabLayout.getTabAt(position))
             }
         }

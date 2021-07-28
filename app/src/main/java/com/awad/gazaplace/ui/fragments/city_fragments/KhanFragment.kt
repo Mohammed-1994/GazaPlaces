@@ -13,20 +13,25 @@ import com.awad.gazaplace.databinding.FragmentKhanBinding
 import com.awad.gazaplace.firebase.FirebaseQueries
 import com.awad.gazaplace.ui.HomeActivity
 import com.awad.gazaplace.ui.fragments.filter_search.FilterSearchViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class KhanFragment(val type: String) : Fragment() {
 
-
     private val filterSearchViewModel: FilterSearchViewModel by activityViewModels()
-    private var city = "null"
-    private lateinit var firebaseQueries: FirebaseQueries
-    private lateinit var adapter: PlaceAdapter
-    private lateinit var observer: Observer<PlaceAdapter>
+
+    @Inject
+    lateinit var firebaseQueries: FirebaseQueries
+
+    private lateinit var placeAdapter: PlaceAdapter
+    private lateinit var filterObserver: Observer<PlaceAdapter>
     private var binding: FragmentKhanBinding? = null
+    private var city = "null"
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         city = requireContext().getString(R.string.khan_yunis)
 
@@ -38,18 +43,7 @@ class KhanFragment(val type: String) : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        firebaseQueries = FirebaseQueries(requireContext())
-        adapter = firebaseQueries.queryWithCityAndType(city, type)
-
-        search()
-
-
-        observer = Observer<PlaceAdapter> {
-            updateUi(it)
-        }
-
-
-        filterSearchViewModel.count.observe(viewLifecycleOwner, observer)
+        filterSearch()
 
     }
 
@@ -60,28 +54,35 @@ class KhanFragment(val type: String) : Fragment() {
 
 
     private fun updateUi(adapter: PlaceAdapter) {
-        this.adapter = adapter
+        this.placeAdapter = adapter
 
         binding!!.progressBar.visibility = View.GONE
 
         if (adapter.itemCount > 0) {
             binding!!.noResultTextView.visibility = View.GONE
             adapter.findDistance((activity as HomeActivity).currentLocation)
-
             adapter.startListening()
         } else {
             binding!!.noResultTextView.visibility = View.VISIBLE
         }
     }
 
-    private fun search() {
+    private fun filterSearch() {
 
+        placeAdapter = firebaseQueries.queryWithCityAndType(city, type)
+        filterObserver = Observer<PlaceAdapter> {
+            updateUi(it)
+        }
+        filterSearchViewModel.count.observe(viewLifecycleOwner, filterObserver)
         binding!!.progressBar.visibility = View.VISIBLE
         binding!!.noResultTextView.visibility = View.GONE
-        binding!!.recyclerView.adapter = adapter
-        adapter.startListening()
-
+        binding!!.recyclerView.adapter = placeAdapter
+        placeAdapter.startListening()
     }
 
+    override fun onPause() {
+        super.onPause()
+        filterSearchViewModel.count.removeObserver(filterObserver)
 
+    }
 }

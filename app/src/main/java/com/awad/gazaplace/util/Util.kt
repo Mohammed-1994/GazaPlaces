@@ -17,6 +17,7 @@ class Util @Inject constructor(@ApplicationContext val context: Context) {
         places.add(GridItem(ContextCompat.getDrawable(context,R.drawable.phone), "هواتف"))
         places.add(GridItem(ContextCompat.getDrawable(context,R.drawable.mall), "مولات"))
         places.add(GridItem(ContextCompat.getDrawable(context,R.drawable.ice), "مرطبات"))
+        places.add(GridItem(ContextCompat.getDrawable(context,R.drawable.shop), "ملابس"))
         return places
     }
 

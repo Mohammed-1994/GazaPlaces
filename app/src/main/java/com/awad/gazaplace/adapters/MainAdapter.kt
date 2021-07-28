@@ -3,24 +3,34 @@ package com.awad.gazaplace.adapters
 import android.content.Context
 import android.content.Intent
 import android.location.Location
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.awad.gazaplace.R
 import com.awad.gazaplace.data.PlaceMetaData
 import com.awad.gazaplace.data.RefCityType
+import com.awad.gazaplace.data.RestaurantModel
 import com.awad.gazaplace.databinding.PlaceItemBinding
+import com.awad.gazaplace.ui.MapsActivity
 import com.awad.gazaplace.ui.PlaceActivity
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.qualifiers.ActivityContext
+import javax.inject.Inject
 
 
 private const val TAG = "MinAdapter, myTag"
 
-class MainAdapter(@ActivityContext var context: Context) :
-    RecyclerView.Adapter<MainAdapter.MainAdapterViewHolder>() {
+class MainAdapter @Inject constructor(
+    @ActivityContext var context: Context,
 
+
+    var fireStore: FirebaseFirestore
+) :
+    RecyclerView.Adapter<MainAdapter.MainAdapterViewHolder>() {
 
     private var location = Location("")
     var matchingDocs: MutableList<PlaceMetaData> = ArrayList()
@@ -32,7 +42,6 @@ class MainAdapter(@ActivityContext var context: Context) :
         val view = PlaceItemBinding
             .inflate(LayoutInflater.from(parent.context), parent, false)
         return MainAdapterViewHolder(view)
-
     }
 
     override fun getItemCount(): Int {
@@ -47,6 +56,15 @@ class MainAdapter(@ActivityContext var context: Context) :
             binding.root.setOnClickListener {
                 navigateToPlaceActivity(currentPlace)
             }
+            binding.showMap.setOnClickListener {
+                navigateToMapsActivity(currentPlace)
+            }
+            binding.info.setOnClickListener {
+                navigateToPlaceActivity(currentPlace)
+            }
+            binding.call.setOnClickListener {
+                getPhoneNumber(currentPlace)
+            }
             try {
                 binding.address.text = currentPlace.address
                 binding.title.text = currentPlace.name
@@ -59,6 +77,42 @@ class MainAdapter(@ActivityContext var context: Context) :
         }
 
 
+    }
+
+    private fun makeCall(phoneNumber: String?) {
+        if (phoneNumber != null) {
+            val intent = Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phoneNumber, null))
+            startActivity(context, intent, null)
+        } else {
+            Toast.makeText(context, "لا يوجد هاتف لهذا المكان", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun getPhoneNumber(currentMetaData: PlaceMetaData) {
+
+        var phoneNO: String?
+        fireStore.collection(context.getString(R.string.firestore_collection_cities))
+            .document(currentMetaData.city)
+            .collection(currentMetaData.type)
+            .document(currentMetaData.ref_id)
+            .get()
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    val place = it.result.toObject(RestaurantModel::class.java)!!
+                    phoneNO = place.main_info!!["phone"].toString()
+                    makeCall(phoneNO)
+                }
+            }
+
+    }
+
+    private fun navigateToMapsActivity(currentMetaData: PlaceMetaData) {
+        val location = currentMetaData.location
+        val intent = Intent(context, MapsActivity::class.java)
+        intent.putExtra("lat", location.latitude)
+        intent.putExtra("lng", location.longitude)
+        intent.putExtra("name", currentMetaData.name)
+        startActivity(context, intent, null)
     }
 
     private fun navigateToPlaceActivity(currentMetaData: PlaceMetaData) {
@@ -81,7 +135,6 @@ class MainAdapter(@ActivityContext var context: Context) :
 
 
     private fun getImages(model: PlaceMetaData, holder: MainAdapterViewHolder) {
-        val fireStore = FirebaseFirestore.getInstance()
         fireStore.collection(context.getString(R.string.firestore_collection_cities))
             .document(model.city)
             .collection(model.type)
@@ -111,7 +164,7 @@ class MainAdapter(@ActivityContext var context: Context) :
 
         with(holder) {
 
-            val sliderView = binding.imageSlider!!
+            val sliderView = binding.imageSlider
 
             val sliderAdapter = SliderAdapter(context)
             if (imagesList.size == 0) {

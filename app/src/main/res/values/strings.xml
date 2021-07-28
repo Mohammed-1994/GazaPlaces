@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">دليلي</string>
+    <string name="app_name">الغزاوي</string>
 
 
     <string name="chose_city">حدد المحافظة</string>
@@ -38,10 +38,15 @@
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_home">HomeActivity</string>
     <string name="title_home">الرئيسية</string>
-    <string name="title_advanced_search">مخصص</string>
+    <string name="title_cities">المحافظات</string>
     <string name="title_area">بالقرب</string>
+    <string name="title_campaigns">الحملات</string>
+    <string name="title_about">الغزاوي</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="page_title">الغزاوي</string>
+    <string name="show_on_map">عرض على الخريطة</string>
+    <string name="make_call">اتصال</string>
 
 
 </resources>

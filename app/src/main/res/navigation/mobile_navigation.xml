@@ -14,7 +14,7 @@
     <fragment
         android:id="@+id/navigation_dashboard"
         android:name="com.awad.gazaplace.ui.fragments.filter_search.DashboardFragment"
-        android:label="@string/title_advanced_search"
+        android:label="@string/title_cities"
         tools:layout="@layout/fragment_filte_search">
         <action
             android:id="@+id/startMyFragment"

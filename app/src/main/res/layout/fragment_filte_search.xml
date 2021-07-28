@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:horizontalSpacing="1dp"
-        android:numColumns="auto_fit"
+        android:numColumns="1"
         android:verticalSpacing="1dp"
         tools:listitem="@layout/grid_list_item" />
 

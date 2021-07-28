@@ -43,7 +43,6 @@ class FirebaseQueries  @Inject constructor(@ActivityContext var context: Context
      */
 
     fun nearestLocations(center: Location, radius: Double) {
-        Log.d(TAG, "nearestLocations: radius = $radius, ${center.longitude}, ${center.latitude}")
         val matchingDocs: MutableList<PlaceMetaData> = ArrayList()
         val center = GeoLocation(center.latitude, center.longitude)
 
@@ -64,7 +63,7 @@ class FirebaseQueries  @Inject constructor(@ActivityContext var context: Context
             tasks.add(q.get())
         }
         // Collect all the query results together into a single list
-        Log.d(TAG, "nearestLocations: task size = ${tasks.size}")
+
         Tasks.whenAllComplete(tasks)
             .addOnCompleteListener {
 
@@ -85,8 +84,6 @@ class FirebaseQueries  @Inject constructor(@ActivityContext var context: Context
                 }
 
 //                (context as MainActivity).submitNearestPlacesToAdapter(matchingDocs)
-                Log.d(TAG, "nearestLocations: result size = ${matchingDocs.size}")
-
 
                 homeViewModel.setData(matchingDocs)
 
@@ -113,7 +110,7 @@ class FirebaseQueries  @Inject constructor(@ActivityContext var context: Context
 
 
     fun searchArea(location: Location, type: String, radius: Double) {
-        Log.d(TAG, "searchArea: $type, $radius, $location ")
+
         val matchingDocs: MutableList<PlaceMetaData> = ArrayList()
         val center = GeoLocation(location.latitude, location.longitude)
 
@@ -122,7 +119,7 @@ class FirebaseQueries  @Inject constructor(@ActivityContext var context: Context
             center,
             radius
         )
-        Log.d(TAG, "searchArea: bound size = ${bounds.size}")
+
         val tasks: MutableList<Task<QuerySnapshot>> = ArrayList()
         for (b in bounds) {
 
@@ -136,7 +133,7 @@ class FirebaseQueries  @Inject constructor(@ActivityContext var context: Context
 
             tasks.add(q.get())
         }
-        Log.d(TAG, "searchArea: tasks size = ${tasks.size}")
+
         // Collect all the query results together into a single list
         Tasks.whenAllComplete(tasks)
             .addOnCompleteListener {
@@ -158,7 +155,7 @@ class FirebaseQueries  @Inject constructor(@ActivityContext var context: Context
                     }
 
                 }
-                Log.d(TAG, "searchArea: size = ${matchingDocs.size}")
+                
                 areaSearchViewModel.setData(matchingDocs)
 
 

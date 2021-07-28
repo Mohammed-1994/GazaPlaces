@@ -1,6 +1,5 @@
 package com.awad.gazaplace.ui.fragments.home
 
-import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,14 +13,15 @@ import com.awad.gazaplace.data.PlaceMetaData
 import com.awad.gazaplace.databinding.FragmentHomeBinding
 import com.awad.gazaplace.maps.UpdateLocation
 import com.awad.gazaplace.ui.HomeActivity
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+
 
 private const val TAG = "HomeFragment, myTag"
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
-    private lateinit var currentLocation: Location
     private val homeViewModel: HomeViewModel by activityViewModels()
     private lateinit var binding: FragmentHomeBinding
     private var age = 0
@@ -30,22 +30,18 @@ class HomeFragment : Fragment() {
     @Inject
     lateinit var updateLocation: UpdateLocation
 
+    @Inject
+    lateinit var firebaseFirestore: FirebaseFirestore
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-
-
         binding = FragmentHomeBinding.inflate(inflater, container, false)
-
         val root: View = binding.root
-
         homeViewModel.placesLiveData.observe(viewLifecycleOwner, {
             updateUi(it)
-        }
-
-        )
-
+        })
         return root
     }
 
@@ -53,6 +49,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         updateLocation.getSettingsResult()
         updateLocation.getLastKnownLocation()
+
     }
 
     private fun updateUi(places: MutableList<PlaceMetaData>?) {
@@ -60,7 +57,7 @@ class HomeFragment : Fragment() {
 
         if (places?.size!! > 0) {
             binding.noResultTextView.visibility = GONE
-            val adapter = MainAdapter(requireContext())
+            val adapter = MainAdapter(requireContext(), firebaseFirestore)
             adapter.submitPlaces(places)
             binding.recyclerView.adapter = adapter
             adapter.findDistance((activity as HomeActivity).currentLocation)
@@ -70,7 +67,6 @@ class HomeFragment : Fragment() {
         }
 
     }
-
 
 
 }

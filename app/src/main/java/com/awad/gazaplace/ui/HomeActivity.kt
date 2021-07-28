@@ -5,19 +5,16 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
-import android.view.View
-import android.widget.RadioButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import com.awad.gazaplace.R
-import com.awad.gazaplace.adapters.PlaceAdapter
 import com.awad.gazaplace.databinding.ActivityHomeBinding
 import com.awad.gazaplace.firebase.FirebaseQueries
 import com.awad.gazaplace.maps.MyLocationUpdatesCallback
@@ -50,25 +47,22 @@ class HomeActivity : AppCompatActivity(), MyLocationUpdatesCallback {
     lateinit var updateLocation: UpdateLocation
 
     private lateinit var homeViewModel: HomeViewModel
-    private var city = "null"
-    private var type = "null"
+
     var currentLocation = Location("")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
-
-        val navView = binding.navView
-
-
         checkLocationPermission()
 
         val appBarConfiguration = AppBarConfiguration.Builder(
             R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
         )
             .build()
-        val navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_home)
+//        val navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_home)
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_home) as NavHostFragment
+        val navController = navHostFragment.navController
 //        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
         NavigationUI.setupWithNavController(binding.navView, navController)
 
@@ -94,13 +88,6 @@ class HomeActivity : AppCompatActivity(), MyLocationUpdatesCallback {
 
     }
 
-    fun onTypeRadioGroupClicked(view: View) {
-        type = (view as RadioButton).text.toString()
-    }
-
-    fun onCityRadioGroupClicked(view: View) {
-        city = (view as RadioButton).text.toString()
-    }
 
 
     // *********     ****///***///***///**/     *********//////////
@@ -187,14 +174,6 @@ class HomeActivity : AppCompatActivity(), MyLocationUpdatesCallback {
         }
     }
 
-    fun searchFilter(): PlaceAdapter {
-        return firebaseQueries.queryWithCityAndType(city, type)
-    }
-
-    fun searchArea(type: String, radius: Double) {
-
-        firebaseQueries.searchArea(updateLocation.mLocation, type, radius)
-    }
 
     override fun onLocationUpdated(location: Location) {
 

@@ -2,14 +2,16 @@ package com.awad.gazaplace.ui.fragments
 
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.Typeface
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -24,6 +26,7 @@ import com.awad.gazaplace.maps.UpdateLocation
 import com.awad.gazaplace.ui.HomeActivity
 import com.awad.gazaplace.ui.MapsActivity
 import com.awad.gazaplace.ui.fragments.area_search.AreaSearchViewModel
+import com.google.firebase.firestore.FirebaseFirestore
 import com.skydoves.powermenu.MenuAnimation
 import com.skydoves.powermenu.OnMenuItemClickListener
 import com.skydoves.powermenu.PowerMenu
@@ -53,14 +56,18 @@ class AllTypesFragment : Fragment() {
     private val areaSearchViewModel: AreaSearchViewModel by activityViewModels()
     private var type: String = ""
     private val list = ArrayList<PlaceMetaDataForMap>()
-
+    private lateinit var tempView : FragmentAllTypesBinding
 
     @Inject
     lateinit var updateLocation: UpdateLocation
 
     @Inject
+    lateinit var firebaseFirestore: FirebaseFirestore
+
+    @Inject
     lateinit var firebaseQueries: FirebaseQueries
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         arguments?.let {
             type = it.getString(PLACE_TYPE)!!
@@ -70,18 +77,32 @@ class AllTypesFragment : Fragment() {
     }
 
     override fun onCreateView(
-
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
         binding = FragmentAllTypesBinding.inflate(inflater, container, false)
+        tempView = binding!!
 
         return binding!!.root
     }
 
+    override fun onResume() {
+        super.onResume()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    override fun onStart() {
+        super.onStart()
+        binding = tempView
+        createMenu()
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        createMenu()
+
         areaSearch(5000.0)
         binding!!.mapFabBtn.setOnClickListener {
 
@@ -96,12 +117,14 @@ class AllTypesFragment : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun createMenu() {
         val list = mutableListOf(
             PowerMenuItem("5 KM"),
             PowerMenuItem("10 KM"),
             PowerMenuItem("15 KM"),
         )
+        val typeface = resources.getFont(R.font.tajawal_bold)
         val powerMenu = PowerMenu.Builder(requireContext())
             .addItemList(list) // list has "Novel", "Poerty", "Art"
             .setAnimation(MenuAnimation.SHOWUP_TOP_LEFT) // Animation start point (TOP | LEFT).
@@ -109,10 +132,10 @@ class AllTypesFragment : Fragment() {
             .setMenuShadow(10f) // sets the shadow.
             .setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
             .setTextGravity(Gravity.CENTER)
-            .setTextTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD))
+            .setTextTypeface(typeface)
             .setSelectedTextColor(Color.WHITE)
             .setMenuColor(Color.WHITE)
-            .setSelectedMenuColor(ContextCompat.getColor(requireContext(), R.color.purple_200))
+            .setSelectedMenuColor(ContextCompat.getColor(requireContext(), R.color.secondaryLightColor))
             .setLifecycleOwner(viewLifecycleOwner)
             .build()
 
@@ -142,7 +165,10 @@ class AllTypesFragment : Fragment() {
         binding?.menu?.setOnClickListener {
             powerMenu.showAsDropDown(binding?.menu)
         }
+
+
     }
+
 
 
     private fun areaSearch(radius: Double) {
@@ -153,6 +179,7 @@ class AllTypesFragment : Fragment() {
         list.clear()
         binding!!.mapFabBtn.visibility = View.VISIBLE
         firebaseQueries.searchArea(updateLocation.mLocation, type, radius)
+        Log.d(TAG, "areaSearch: ${updateLocation.mLocation}")
         areaObserver = Observer<MutableList<PlaceMetaData>> {
             updateUi(it)
         }
@@ -185,7 +212,7 @@ class AllTypesFragment : Fragment() {
 
         if (places.size > 0) {
             binding!!.noResultTextView.visibility = View.GONE
-            mainAdapter = MainAdapter(requireContext())
+            mainAdapter = MainAdapter(requireContext(),firebaseFirestore )
             mainAdapter.submitPlaces(places)
             binding!!.recyclerView.adapter = mainAdapter
             mainAdapter.findDistance((activity as HomeActivity).currentLocation)

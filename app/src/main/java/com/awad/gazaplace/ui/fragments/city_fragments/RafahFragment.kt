@@ -1,6 +1,7 @@
 package com.awad.gazaplace.ui.fragments.city_fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,16 +14,18 @@ import com.awad.gazaplace.databinding.FragmentRafahBinding
 import com.awad.gazaplace.firebase.FirebaseQueries
 import com.awad.gazaplace.ui.HomeActivity
 import com.awad.gazaplace.ui.fragments.filter_search.FilterSearchViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 private const val TAG = "RafahFragment myTag"
-private const val FILTER_SEARCH = 0
-private const val AREA_SEARCH = 1
 
+@AndroidEntryPoint
 class RafahFragment(val type: String) : Fragment() {
-
-
     private val filterSearchViewModel: FilterSearchViewModel by activityViewModels()
-    private lateinit var firebaseQueries: FirebaseQueries
+
+    @Inject
+    lateinit var firebaseQueries: FirebaseQueries
+
     private lateinit var placeAdapter: PlaceAdapter
     private lateinit var filterObserver: Observer<PlaceAdapter>
     private var binding: FragmentRafahBinding? = null
@@ -42,8 +45,6 @@ class RafahFragment(val type: String) : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        firebaseQueries = FirebaseQueries(requireContext())
-
         filterSearch()
 
 
@@ -51,6 +52,8 @@ class RafahFragment(val type: String) : Fragment() {
 
 
     private fun updateUi(adapter: PlaceAdapter) {
+        Log.d(TAG, "updateUi: ${adapter.itemCount}")
+
         this.placeAdapter = adapter
 
         binding!!.progressBar.visibility = View.GONE
@@ -80,6 +83,13 @@ class RafahFragment(val type: String) : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.d(TAG, "onDestroy: ")
         binding = null
+    }
+
+    override fun onPause() {
+        super.onPause()
+        filterSearchViewModel.count.removeObserver(filterObserver)
+
     }
 }

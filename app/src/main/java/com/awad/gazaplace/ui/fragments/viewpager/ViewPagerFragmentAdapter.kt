@@ -14,14 +14,16 @@ class ViewPagerFragmentAdapter constructor(
     lifecycle: Lifecycle
 
 ) : FragmentStateAdapter(fragmentManager, lifecycle) {
+
+
     override fun getItemCount(): Int {
         return 5
     }
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            1 -> KhanFragment(type)
-            2 -> NorthFragment(type)
+            1 -> NorthFragment(type)
+            2 -> KhanFragment(type)
             3 -> CentralFragment(type)
             4 -> RafahFragment(type)
             else -> GazaFragment(type)

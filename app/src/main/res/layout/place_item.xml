@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
 
-    android:layout_marginBottom="4dp"
+    android:layout_marginBottom="8dp"
     app:cardCornerRadius="16dp"
     app:cardElevation="12dp"
     app:cardMaxElevation="12dp"
@@ -23,8 +23,9 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:layout_marginBottom="16dp"
+            android:fontFamily="@font/tajawal_bold"
             android:text="title"
-            android:textColor="@android:color/black"
+            android:textColor="@color/primaryTextColor"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -35,8 +36,13 @@
             android:id="@+id/imageSlider"
             android:layout_width="match_parent"
             android:layout_height="250dp"
-            app:sliderAnimationDuration="600"
+            android:layout_marginTop="8dp"
             android:clickable="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/title"
+            app:sliderAnimationDuration="600"
             app:sliderAutoCycleDirection="back_and_forth"
             app:sliderAutoCycleEnabled="true"
             app:sliderIndicatorAnimationDuration="600"
@@ -45,39 +51,93 @@
             app:sliderIndicatorOrientation="horizontal"
             app:sliderIndicatorPadding="2dp"
             app:sliderIndicatorRadius="1dp"
-            app:sliderIndicatorSelectedColor="#5A5A5A"
-            app:sliderIndicatorUnselectedColor="#FFF"
+            app:sliderIndicatorSelectedColor="@color/secondaryDarkColor"
+            app:sliderIndicatorUnselectedColor="@color/primaryDarkColor"
             app:sliderScrollTimeInSec="4"
-            app:sliderStartAutoCycle="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/title" />
+            app:sliderStartAutoCycle="true" />
+
+
         <TextView
             android:id="@+id/address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
+            android:drawablePadding="8dp"
+            android:fontFamily="@font/tajawal_regular"
+            android:gravity="center"
             android:text="address"
-            android:textColor="@color/black"
+            android:textColor="@color/primaryTextColor"
+            app:drawableStartCompat="@drawable/ic_map"
+            app:layout_constraintEnd_toStartOf="@+id/distance"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageSlider" />
-
-
 
         <TextView
             android:id="@+id/distance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
+            android:drawablePadding="8dp"
+            android:fontFamily="@font/tajawal_regular"
+            android:gravity="center"
             android:text="distance"
-            android:textColor="@color/purple_700"
+            android:textColor="@color/primaryTextColor"
+            app:drawableEndCompat="@drawable/ic_distance"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toEndOf="@+id/address"
             app:layout_constraintTop_toBottomOf="@+id/imageSlider" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="4dp"
+            android:elevation="8dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="4dp"
+            android:weightSum="3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/address">
+
+
+            <ImageButton
+                android:id="@+id/call"
+                style="@style/Widget.AppCompat.ActionButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+
+                android:layout_weight="1"
+                android:elevation="4dp"
+                android:gravity="center"
+                android:src="@drawable/ic_phone_call" />
+
+
+            <ImageButton
+                android:id="@+id/info"
+                style="@style/Widget.AppCompat.ActionButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:layout_weight="1"
+                android:elevation="4dp"
+                android:gravity="center"
+                android:src="@drawable/ic_information" />
+
+            <ImageButton
+                android:id="@+id/show_map"
+                style="@style/Widget.AppCompat.ActionButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:layout_weight="1"
+                android:elevation="4dp"
+                android:gravity="center"
+                android:src="@drawable/ic_map_black_24dp" />
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
